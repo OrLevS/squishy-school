@@ -6,7 +6,7 @@
 <title>חוברת שבועית</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/booklet.css">
+<link rel="stylesheet" href="../css/booklet.css?v=4">
 </head>
 <body>
 <div class="toolbar">חוברת להדפסה · A4 · שחור־לבן <button onclick="print()">🖨 הדפסה / שמירה כ-PDF</button></div>
@@ -14,10 +14,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
-<script src="../js/continents.js"></script>
-<script src="../js/config.js"></script>
-<script>document.write('<script src="../data/week-' + String(new URLSearchParams(location.search).get('w') || 1).padStart(2, '0') + '.js"><\/script>');</script>
-<script src="../js/kidpages.js"></script>
-<script src="../js/booklet.js"></script>
+<script src="../js/continents.js?v=4"></script>
+<script src="../js/config.js?v=4"></script>
+<script>document.write('<script src="../data/week-' + String(new URLSearchParams(location.search).get('w') || 1).padStart(2, '0') + '.js?v=4"><\/script>');</script>
+<script src="../js/kidpages.js?v=4"></script>
+<script src="../js/booklet.js?v=4"></script>
 </body>
 </html>

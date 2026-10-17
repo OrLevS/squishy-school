@@ -11,17 +11,23 @@
   let device = store.get(DEV, null);
   if (!device) { device = 'd-' + Math.random().toString(36).slice(2, 10); store.set(DEV, device); }
 
+  // שליחה אחת בכל רגע: אחרת שתי שליחות במקביל שולחות את אותו תור פעמיים
+  let busy = false, again = false;
   async function flush() {
+    if (busy) { again = true; return; }
     const q = store.get(KEY, []);
     if (!q.length || !cfg.supabaseUrl || !cfg.supabaseKey) return;
+    busy = true;
     try {
       const r = await fetch(`${cfg.supabaseUrl}/rest/v1/events`, {
         method: 'POST',
-        headers: { apikey: cfg.supabaseKey, Authorization: `Bearer ${cfg.supabaseKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        headers: { apikey: cfg.supabaseKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify(q)
       });
       if (r.ok) store.set(KEY, store.get(KEY, []).slice(q.length));
     } catch (e) { /* ננסה שוב בפעם הבאה */ }
+    busy = false;
+    if (again) { again = false; flush(); }
   }
   window.track = function (week, session, step, kind, value) {
     const q = store.get(KEY, []);
