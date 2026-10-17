@@ -82,10 +82,11 @@ const SOUND_SAY = { s: 'סססס', a: 'אַ', t: 'ט', m: 'ממממ', p: 'פּ',
 // קופסת הכרטיסים הדיגיטלית: הכרטיסים של היום לפי המדריך + מה שנשאר ב"עוד לא"
 const BOX = 'sq-box-w' + Wk.n;
 const box = store.get(BOX, { notYet: [] });
-const dueNums = [...new Set([...S.cards, ...box.notYet])];
+// עד 8 כרטיסים במפגש: קודם אלה שהמדריך קבע להיום, ואז מה שחיכה ב"עוד לא"
+const dueNums = [...new Set([...S.cards, ...box.notYet])].slice(0, 8);
 const steps = [];
 if (dueNums.length) steps.push({ t: 'cards-intro' }, ...dueNums.map(n => ({ t: 'card', n })));
-steps.push(...S.kid);
+steps.push(...S.kid, { t: 'mom-note' });
 const guesses = store.get('sq-guess-w' + Wk.n, {});
 let i = 0, done = new Set();
 
@@ -116,10 +117,10 @@ const R = {
       <div class="btn-row" id="judge" hidden><button class="btn teal" data-k="1">✓ ידעתי</button><button class="btn alt" data-k="0">⏳ עוד לא</button></div></div>`;
   },
   paper: st => {
-    const k = kidOf(st.page);
+    const k = kidOf(st.page), no = k.no + (st.off || 0);
     document.body.classList.add('paper');
-    return speaker(st.he) + `<div class="paperbox"><img src="../assets/pages/w${Wk.n}-p${k.no}.png" alt="דף ${k.no}">
-      <div><div class="big">📄 עכשיו בדף ${k.no}</div><div style="font-size:20px">${k.title}${st.task ? ` · משימה ${st.task}` : ''}</div>
+    return speaker(st.he) + `<div class="paperbox"><img src="../assets/pages/w${Wk.n}-p${no}.png" alt="דף ${no}">
+      <div><div class="big">📄 עכשיו בדף ${no}</div><div style="font-size:20px">${k.title}${st.task ? ` · משימה ${st.task}` : ''}</div>
       <p style="margin-top:12px;color:var(--brown)">המסך מחכה. כשמסיימות, לוחצות "הבא".</p></div></div>`;
   },
   guess: st => speaker(st.he, 'wow', st.note) + `<div class="opts">${st.opts.map((o, k) =>
@@ -131,7 +132,22 @@ const R = {
     return `<div class="reveal"><h2>${right ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>${fmt(st.he)}
       ${right ? '' : '\n\nהניחוש שלך לא התאים, וזה בדיוק מה שעוזר לזכור. 💪'}</div>`;
   },
-  mom: st => `<div class="mom"><small>👩 שאלה לשיחה עם אמא</small>${fmt(st.q)}</div>`,
+  mom: st => `<div class="mom"><small>👩 ${st.label || 'שאלה לשיחה עם אמא'}</small>${fmt(st.q)}</div>`,
+  words: st => speaker(st.he) + `<div class="opts">${st.words.map(x => `<div class="cardq"><div class="bigen">${x.w} <button class="speak" onclick="say('${x.w}')">🔊</button></div><div style="font-size:20px">${fmt(x.he)}</div></div>`).join('')}</div>`,
+  hunt: st => {
+    document.body.classList.add('paper');
+    const k = kidOf(st.page);
+    return speaker(st.he) + `<div class="paperbox"><img src="../assets/pages/w${Wk.n}-p${k.no}.png" alt="דף ${k.no}">
+      <div style="flex:1"><div class="big" id="hrow">שורה 1</div><div style="font-size:30px;margin:8px 0" id="hsay"></div>
+      <div class="btn-row" style="justify-content:flex-start"><button class="btn teal" id="hnext">השורה הבאה</button></div></div></div>`;
+  },
+  read: st => speaker(st.he) + `<div class="cardq" id="rd"></div>`,
+  'mom-note': () => `<div class="mom"><small>👩 לאמא · לוקח דקה</small>
+      <label style="display:block;font-size:20px;margin-bottom:6px">מה הלך טוב היום?</label>
+      <textarea id="good" rows="3" style="width:100%;font:inherit;font-size:19px;border-radius:14px;border:0;padding:10px"></textarea>
+      <label style="display:block;font-size:20px;margin:14px 0 6px">מה היה פחות? איפה היא נתקעה?</label>
+      <textarea id="less" rows="3" style="width:100%;font:inherit;font-size:19px;border-radius:14px;border:0;padding:10px"></textarea>
+      <div class="btn-row" style="justify-content:flex-start"><button class="btn" id="sendnote">שליחה ✓</button><span id="sent" style="color:var(--gold)"></span></div></div>`,
   break: st => speaker(st.he) + `<div class="timer" id="tm">${st.min}:00</div><div class="btn-row"><button class="btn teal" id="go">▶ מתחילים</button></div>`,
   sounds: st => speaker(st.he) + `<div class="tiles">${st.letters.map(l => `<button class="tile" data-l="${l}">${l}<small></small></button>`).join('')}</div>`,
   blend: st => speaker(st.he) + `<div class="blend" id="bl"></div>`,
@@ -197,6 +213,35 @@ const WIRE = {
     };
     draw();
   },
+  hunt: st => {
+    let r = 0;
+    const set = () => { $('hrow').textContent = `שורה ${r + 1} מתוך ${st.targets.length}`; $('hsay').textContent = `מקיפים את הצליל: ${SOUND_SAY[st.targets[r]]}`; $('hnext').textContent = r < st.targets.length - 1 ? 'השורה הבאה' : '✓ סיימנו את הציד'; };
+    $('hnext').onclick = () => { if (r < st.targets.length - 1) { r++; set(); } else { T('hunt-done', null); go(1); } };
+    set();
+  },
+  read: () => {
+    let w = 0; const res = {};
+    const draw = () => {
+      const x = Wk.words[w];
+      $('rd').innerHTML = `<div class="bigen" style="font-size:80px">${x.w}</div>
+        <div class="btn-row"><button class="speak" id="chk">🔊</button></div>
+        <div class="btn-row"><button class="btn teal" data-r="1">✓ קראתי</button><button class="btn alt" data-r="0">⏳ עוד לא</button></div>
+        <div style="color:var(--brown)">מילה ${w + 1} מתוך ${Wk.words.length}</div>`;
+      $('chk').onclick = () => say(x.w);
+      $('rd').querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+        res[x.w] = b.dataset.r === '1';
+        if (w < Wk.words.length - 1) { w++; draw(); }
+        else { T('read', res); $('rd').innerHTML = `<div style="font-size:28px">קראת ${Object.values(res).filter(Boolean).length} מתוך ${Wk.words.length} מילים לבד! 🎉</div>`; }
+      });
+    };
+    draw();
+  },
+  'mom-note': () => {
+    $('sendnote').onclick = () => {
+      T('mom-note', { good: $('good').value.trim(), less: $('less').value.trim() });
+      $('sent').textContent = 'נשלח. תודה! 💛';
+    };
+  },
   end: () => document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
     document.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('chosen', x === b));
     T('mood', b.dataset.m);
@@ -222,6 +267,9 @@ function go(d) {
     return;
   }
   if (d > 0 && i === steps.length - 1) {
+    // אם אמא כתבה ולא לחצה "שליחה", שולחים בכל זאת
+    if ($('good') && !$('sent').textContent && ($('good').value.trim() || $('less').value.trim()))
+      T('mom-note', { good: $('good').value.trim(), less: $('less').value.trim() });
     T('session-done', null);
     $('stage').innerHTML = speaker('כל הכבוד! 🎉\nנתראה במפגש הבא.') + `<div class="btn-row"><a class="btn" href="../w${Wk.n}/">חזרה לשבוע</a></div>`;
     $('next').hidden = true; $('back').hidden = true;

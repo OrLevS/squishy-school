@@ -403,6 +403,11 @@ function modeContinents() {
     paint();
   }
   function doneCount() {
+    if (window.EMBED) {
+      stage = 'israel-done'; paint();
+      side.innerHTML = `<div class="result"><h2>🎉 מצאת את כולן!</h2><p>יש <b>7 יבשות</b>.</p><p>הנקודה ● היא ישראל, והיא ב<b>אסיה</b>.</p><p>לוחצים "הבא" למטה.</p></div>`;
+      return;
+    }
     stage = 'israel';
     paint();
     side.innerHTML = `<div class="result"><h2>${guessN === 7 ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>
@@ -420,7 +425,8 @@ function modeContinents() {
     $('again').onclick = () => { found.clear(); stage = 'guess'; paint(); askCount(); };
   }
   render = paint;
-  askCount();
+  // בנגן המפגש הניחושים כבר נעשו במסכים הקודמים
+  if (window.EMBED) startCount(); else askCount();
 }
 
 function overlay(icon, title, text) {

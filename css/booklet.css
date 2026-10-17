@@ -329,3 +329,4 @@ table.track .en { font-size: 15pt; }
 .act-list .ic { font-size: 15pt; }
 .sess-list a { padding: 2mm 1.5mm; font-size: 10pt; line-height: 1.25; }
 .sess-list b { font-size: 16pt; }
+.mom-color .st.chip.play { background: var(--coral); color: #fff; border-color: var(--coral); font-weight: 700; }

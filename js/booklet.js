@@ -176,11 +176,11 @@
         <span><b>הדפים של הילדה לשבוע הזה</b><br>PDF בשחור־לבן להדפסה · ${KID.reduce((a, k) => a + (k.pages || 1), 0) + 1} עמודים</span>
         <span class="go">פותחים ↗</span>
       </a>
-      <div class="sentence">משפט השבוע: <span class="en">${esc(W.sentence)}</span></div>
+      <a class="kidpdf" style="background:var(--coral)" href="${SITE.base}w${W.n}/"><span class="ic">▶</span><span><b style="color:var(--cream)">המפגשים בנגן של סקווישי</b><br>המסך מוביל את המפגש, את מלווה. בסוף כל מפגש יש מלבן "לאמא".</span><span class="go">פותחים ↗</span></a>
       <div class="before"><b class="t">לפני שמתחילות (פעם אחת בשבוע)</b><ol>
-        <li>מדפיסות את הדפים של הילדה (הכפתור הכחול למעלה).</li>
-        <li>גוזרות את כרטיסי הקופסה ומקפלות: ${pageRef(kid('cards'))}</li>
-        <li>מכינות קופסת נעליים לכרטיסים, ומקום לערמת "עוד לא".</li>
+        <li>מדפיסות את הדפים של הילדה (הכפתור הכחול).</li>
+        <li>פותחות את הנגן במחשב (הכפתור הכתום). הוא מוביל את המפגש ומנהל לבד את כרטיסי הזיכרון.</li>
+        <li>בסוף כל מפגש: שתי שורות במלבן "לאמא". זה כל התיעוד.</li>
         <li>אם עוד לא קראת: <a class="st ref" href="${SITE.base}pdf/${encodeURIComponent('מדריך-לאמא-צבע.pdf')}">📘 למה השיעור בנוי ככה ↗</a></li>
       </ol></div>
       <h2 class="sec">📅 המפגשים</h2>
@@ -253,7 +253,7 @@
     const total = parts.reduce((a, b) => a + b.min, 0) + 3;
     const prep = s.prep.map(p => p.pages ? p.pages.map(id => pageRef(kid(id))).join('') : `<span class="st chip">${esc(p.t)}</span>`).join('');
     return `<section class="page sess" id="s${s.n}">
-      <div class="ph"><span class="who mom">לאמא</span><h1>מפגש ${s.n}: ${esc(s.title)}</h1><span class="st chip">⏱ ${total} דק׳</span></div>
+      <div class="ph"><span class="who mom">לאמא</span><h1>מפגש ${s.n}: ${esc(s.title)}</h1>${MOM && s.kid ? `<a class="st chip play" href="${url(`play/lesson.html?w=${W.n}&s=${s.n}`)}">▶ פותחים בנגן</a>` : ''}<span class="st chip">⏱ ${total} דק׳</span></div>
       <div class="goal">${tx(s.goal)}</div>
       <div class="prep2"><b>מה נכין</b> ${prep}</div>
       ${parts.map((p, pi) => `
