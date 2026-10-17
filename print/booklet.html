@@ -12,6 +12,9 @@
 <div class="toolbar">חוברת להדפסה · A4 · שחור־לבן <button onclick="print()">🖨 הדפסה / שמירה כ-PDF</button></div>
 <main id="booklet"></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="../js/continents.js"></script>
 <script src="../js/config.js"></script>
 <script>document.write('<script src="../data/week-' + String(new URLSearchParams(location.search).get('w') || 1).padStart(2, '0') + '.js"><\/script>');</script>
 <script src="../js/booklet.js"></script>

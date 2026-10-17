@@ -227,7 +227,7 @@ table.track .en { font-size: 15pt; }
 .kidpdf .go { margin-inline-start: auto; background: var(--gold); color: var(--navy); border-radius: 99px; padding: 1.5mm 5mm; font-weight: 700; white-space: nowrap; }
 .cover-mom .sentence { background: #fff; border-radius: 5mm; padding: 3mm 5mm; margin-bottom: 2mm; }
 .cover-mom .sentence .en { font-size: 20pt; }
-.sess-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; }
+.sess-list { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2.5mm; }
 .sess-list a { background: #fff; border-radius: 5mm; padding: 3mm; display: flex; flex-direction: column; gap: 1mm; text-align: center; align-items: center; border: .5mm solid var(--beige); }
 .sess-list b { font-family: var(--title); font-weight: normal; font-size: 20pt; color: var(--coral); line-height: 1; }
 .sess-list small, .act-list small { color: var(--brown); font-size: 9.5pt; }
@@ -318,3 +318,14 @@ table.track .en { font-size: 15pt; }
 .mom-color #english .note { margin: 2mm 0; font-size: 10pt; }
 .mom-color .cover-mom .hero { margin-bottom: 3mm; }
 .mom-color .cover-mom h2.sec { margin: 3mm 0 1.5mm; }
+/* 7 פעילויות: רשת צפופה יותר בשערים */
+.qrgrid { grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+.qrc { padding: 2.5mm; }
+.qrc svg { width: 25mm; height: 25mm; }
+.qrc .t { font-size: 11pt; }
+.qrc .d { font-size: 8.5pt; }
+.act-list { grid-template-columns: 1fr 1fr 1fr; gap: 2.5mm; }
+.act-list a { padding: 2.5mm 3mm; font-size: 10.5pt; }
+.act-list .ic { font-size: 15pt; }
+.sess-list a { padding: 2mm 1.5mm; font-size: 10pt; line-height: 1.25; }
+.sess-list b { font-size: 16pt; }

@@ -58,13 +58,16 @@
 
   // ---------- מספור דפי הילדה ----------
   // סדר הדפים לפי המפגש שבו משתמשים בהם לראשונה.
+  // 6 כרטיסים בעמוד. התוויות נכנסות לעמוד האחרון רק אם יש בו עד 5 כרטיסים.
+  const CARD_PAGES = (() => { const n = W.cards.length, c = Math.ceil(n / 6); return n - (c - 1) * 6 > 5 ? c + 1 : c; })();
   const KID = [
     { id: 'k-draw', title: 'כדור הארץ שלי' },
     { id: 'k-sounds', title: 'הצלילים של השבוע' },
     { id: 'k-land-water', title: 'יבשה או מים?' },
     { id: 'w-letters', title: 'כותבים אותיות' },
-    { id: 'cards', title: 'כרטיסי הקופסה', pages: 2 },
+    { id: 'cards', title: 'כרטיסי הקופסה', pages: CARD_PAGES },
     { id: 'k-globe-map', title: 'כדור ומפה' },
+    { id: 'k-continents', title: 'שבע היבשות' },
     { id: 'k-sentence', title: 'בונים משפט' },
     { id: 'k-address', title: 'הכתובת שלי' },
     { id: 'w-sentence', title: 'משפט השבוע', pages: 2 },
@@ -200,8 +203,8 @@
       </ol></div>
       <h2 class="sec">📅 המפגשים</h2>
       <div class="sess-list">
-        <a href="#english"><b>🔤</b><span>האנגלית של השבוע<br><small>איך מבטאים · לקרוא לפני מפגש 1</small></span></a>
-        ${W.sessions.map(s => `<a href="#s${s.n}"><b>${s.n}</b><span>${esc(s.title)}<br><small>60 דק׳</small></span></a>`).join('')}
+        <a href="#english"><b>🔤</b><span>איך מבטאים</span></a>
+        ${W.sessions.map(s => `<a href="#s${s.n}"><b>${s.n}</b><span>${esc(s.title)}</span></a>`).join('')}
       </div>
       <h2 class="sec">📱 הפעילויות של השבוע</h2>
       <div class="act-list">${W.links.map(l => `<a href="${url(l.path)}"><span class="ic">${l.icon}</span><span><b>${tx(l.title)}</b><br><small>${esc(l.desc)} · ${l.session ? 'מפגש ' + l.session : 'כל השבוע'}</small></span></a>`).join('')}</div>
@@ -310,7 +313,7 @@
         <div class="box" style="text-align:center;padding:2mm 0"><div class="en" style="font-size:36pt;line-height:1.1">${s.l}</div>
         <div class="en" style="font-size:14pt;color:#6b6b6b">${s.l.toUpperCase()}</div></div>`).join('')}</div>`)}
     ${task(2, 'read', ['לוחצים על הסקוויש בכל נקודה ●', 'ואז אומרים את כל המילה לאורך החץ.'],
-      `<div dir="ltr" style="display:flex;flex-wrap:wrap;gap:6mm 2mm;justify-content:center">${['at', 'sat', 'pin', 'tip', 'map', 'man'].map(blendWord).join('')}</div>`)}
+      `<div dir="ltr" style="display:flex;flex-wrap:wrap;gap:6mm 2mm;justify-content:center">${['at', 'sat', 'mat', 'pin', 'tip', 'map'].map(blendWord).join('')}</div>`)}
     ${task(3, 'draw', ['מציירים משהו שמתחיל בצליל ס.'], `<div class="drawbox" style="height:42mm"></div>`)}
   `);
 
@@ -330,7 +333,7 @@
   P['w-letters'] = k => {
     const rows = W.sounds.map((s, i) => {
       const pair = s.l.toUpperCase() + s.l;
-      const ses = i < 3 ? 1 : i < 6 ? 2 : 3;
+      const ses = i < 4 ? 1 : 2;
       return `<div style="display:flex;align-items:center;gap:2mm"><span style="font-size:8.5pt;width:14mm;white-space:nowrap;text-align:center;color:#6b6b6b">מפגש ${ses}</span><div style="flex:1">${hw([
         { t: pair, mode: 'solid', sep: true }, { t: pair, mode: 'trace' }, { t: pair, mode: 'trace' }, { mode: 'blank', w: 1.4 }], { h: 162 })}</div></div>`;
     }).join('');
@@ -346,12 +349,15 @@
       <div class="fold"></div>
       <div class="cb"><span class="kind">תשובה</span><div class="a">${esc(c.a)}</div><span class="for">לאמא · נכנס במפגש ${c.s}</span></div>
     </div>`;
-    const first = W.cards.slice(0, 6), rest = W.cards.slice(6);
+    const chunks = [];
+    for (let c = 0; c < W.cards.length; c += 6) chunks.push(W.cards.slice(c, c + 6));
     const ins = `<div class="ins" style="margin-bottom:3mm;font-size:11pt">✂️ גוזרים לאורך הקו המקווקו · מקפלים באמצע · מדביקים. השאלה מצד אחד, התשובה מהצד השני. 🖍 צובעים את הסקווישי.</div>`;
     const labels = `<h2 class="sec" style="margin-top:1mm">✂️ תוויות: לקופסה ולערמת "עוד לא"</h2>
       <div class="labels">${[['🫧', 'קופסת הסקווישים'], ['⏳', 'עוד לא'], ['🫧', 'קופסת הסקווישים'], ['⏳', 'עוד לא']].map(([ic, t]) => `<div><b>${ic}</b>${t}</div>`).join('')}</div>`;
-    return page('kid', k.title, k.no, ins + first.map(row).join('')) +
-      page('kid', k.title + ' (המשך)', k.no + 1, rest.map(row).join('') + labels);
+    const last = chunks[chunks.length - 1];
+    if (last.length > 5) chunks.push([]);
+    return chunks.map((ch, n) => page('kid', k.title + (n ? ' (המשך)' : ''), k.no + n,
+      (n ? '' : ins) + ch.map(row).join('') + (n === chunks.length - 1 ? labels : ''))).join('');
   };
 
   function globePic(kind) {
@@ -369,6 +375,44 @@
       `<div class="bank"><span class="lbl">בנק מילים · אפשר לחזור על מילה</span><span class="w">עגול</span><span class="w">שטוחה</span></div>
        <div class="starter" style="margin-top:5mm;font-size:15pt">גלובוס הוא <span class="blank"></span>.</div>
        <div class="starter" style="margin-top:5mm;font-size:15pt">מפה היא <span class="blank"></span>.</div>`)}
+  `);
+
+  // מפה בשחור־לבן: כל יבשת בדוגמה אחרת, כדי שאפשר יהיה לספור אותן
+  const PATTERNS = {
+    asia: '<pattern id="p-asia" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1" fill="#444"/></pattern>',
+    africa: '<pattern id="p-africa" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#555" stroke-width="1.2"/></pattern>',
+    europe: '<pattern id="p-europe" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 3H6M3 0V6" stroke="#555" stroke-width=".9"/></pattern>',
+    namerica: '<pattern id="p-namerica" width="6" height="6" patternUnits="userSpaceOnUse"><line x1="0" y1="3" x2="6" y2="3" stroke="#555" stroke-width="1.2"/></pattern>',
+    samerica: '<pattern id="p-samerica" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#555" stroke-width="1.2"/></pattern>',
+    oceania: '<pattern id="p-oceania" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#d6d6d6"/></pattern>',
+    antarctica: '<pattern id="p-antarctica" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/></pattern>'
+  };
+  function continentsMap() {
+    if (!window.WORLD) return '<div class="drawbox" style="height:90mm;display:grid;place-items:center">המפה לא נטענה</div>';
+    const Wm = 600, Hm = 305;
+    const proj = d3.geoNaturalEarth1().fitExtent([[4, 4], [Wm - 4, Hm - 4]], { type: 'Sphere' });
+    const pth = d3.geoPath(proj);
+    let out = `<defs>${Object.values(PATTERNS).join('')}</defs><path d="${pth({ type: 'Sphere' })}" fill="#fff" stroke="#1d1d1d" stroke-width="1.2"/>`;
+    const ru = window.WORLD.find(p => p.cont === 'russia');
+    window.WORLD.forEach(p => {
+      if (p.cont === 'russia') return;
+      out += `<path d="${pth(p)}" fill="url(#p-${p.cont})" stroke="#1d1d1d" stroke-width=".7"/>`;
+    });
+    if (ru) [['europe', false], ['asia', true]].forEach(([k, east]) => {
+      out += `<clipPath id="cl-${k}"><path d="${pth(CONT.russiaClip(east))}"/></clipPath><path d="${pth(ru)}" clip-path="url(#cl-${k})" fill="url(#p-${k})" stroke="#1d1d1d" stroke-width=".7"/>`;
+    });
+    out += `<path d="${pth(CONT.URALS)}" fill="none" stroke="#1d1d1d" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+    const il = proj([35, 31.5]);
+    out += `<circle cx="${il[0]}" cy="${il[1]}" r="5.5" fill="#1d1d1d" stroke="#fff" stroke-width="2"/>`;
+    return `<svg viewBox="0 0 ${Wm} ${Hm}" style="width:100%;display:block">${out}</svg>`;
+  }
+  P['k-continents'] = k => page('kid', k.title, k.no, `
+    ${task(1, 'guess', ['כמה יבשות יש על כדור הארץ?'], `<div style="display:flex;align-items:center;gap:4mm;font-size:14pt"><span class="box" style="display:inline-block;width:22mm;height:14mm"></span> יבשות</div>`)}
+    ${continentsMap()}
+    <div style="font-size:9.5pt;margin:1mm 0 3mm">כל יבשת מסומנת בדוגמה אחרת. הקו המקווקו הוא הגבול בין אירופה לאסיה. ● = ישראל</div>
+    ${task(2, 'count', ['כותבים מספר על כל יבשת: 1, 2, 3...', 'כמה יצא?'], `<div style="display:flex;align-items:center;gap:4mm;font-size:14pt"><span class="box" style="display:inline-block;width:22mm;height:14mm"></span> יבשות</div>`)}
+    ${task(3, 'guess', ['ישראל היא הנקודה ●', 'באיזו יבשת היא? מקיפים.'], choices(['אפריקה', 'אסיה', 'אירופה']))}
+    ${task(4, 'write', ['בודקים באתר, ואז כותבים.'], `<div class="starter" style="font-size:15pt">ישראל נמצאת ב<span class="blank"></span>.</div>`)}
   `);
 
   P['k-sentence'] = k => {
@@ -436,9 +480,9 @@
     ${task(1, 'circle', ['עונים לבד, בלי להציץ.'],
       W.review.map(r => `<div style="display:flex;align-items:center;gap:5mm;margin-bottom:4mm;flex-wrap:wrap"><span style="font-size:14pt;min-width:60mm">${esc(r.q)}</span>${choices(r.opts)}</div>`).join(''))}
     ${task(2, 'teach', ['מלמדים את אמא.', 'מסמנים ✓ על כל מה שהסברתי.'],
-      `<div style="display:flex;flex-direction:column;gap:2mm;font-size:14pt"><span>☐ 🌊 מים ויבשה</span><span>☐ 🍊 גלובוס ומפה</span><span>☐ 🏠 הכתובת שלי</span></div>`)}
-    ${task(3, 'guess', ['ניחוש לשבוע הבא:', 'כמה יבשות יש על כדור הארץ?'],
-      `<div style="display:flex;align-items:center;gap:4mm;font-size:14pt"><span class="box" style="display:inline-block;width:24mm;height:18mm"></span> יבשות</div>`)}
+      `<div style="display:flex;flex-direction:column;gap:2mm;font-size:14pt"><span>☐ 🌊 מים ויבשה</span><span>☐ 🍊 גלובוס ומפה</span><span>☐ 🗺️ שבע היבשות</span><span>☐ 🏠 הכתובת שלי</span></div>`)}
+    ${task(3, 'guess', ['ניחוש לשבוע הבא:', 'איזו יבשת היא הכי גדולה?'],
+      `<div class="starter" style="font-size:14pt">לדעתי: <span class="blank" style="min-width:60mm"></span></div>`)}
     <div style="margin-top:auto;display:flex;justify-content:center">${squishy('30mm')}</div>
   `);
 
@@ -452,14 +496,28 @@
   // =====================================================================
   //  הרכבה
   // =====================================================================
-  function build() {
+  async function loadWorld() {
+    if (!window.d3 || !window.topojson) return;
+    try {
+      const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(r => r.json());
+      window.WORLD = CONT.explode(topojson.feature(world, world.objects.countries).features);
+    } catch (e) { /* בלי מפה: הדף מציג מסגרת ריקה */ }
+  }
+  async function build() {
     measure();
+    if (!MOM) await loadWorld();
     let html = '';
     if (PART !== 'kid') html += (MOM ? momCover() : cover()) + english() + W.sessions.map(session).join('');
     if (PART === 'kid') html += cover();
     if (!MOM) KID.forEach(k => { html += P[k.id](k); });
     root.innerHTML = html;
-    document.body.dataset.ready = '1';
+    // בדיקה עצמית: אילו עמודים חורגים מ־A4 (נכתב ל־data-overflow)
+    requestAnimationFrame(() => {
+      const over = [...document.querySelectorAll('.page')].filter(p => p.scrollHeight > p.clientHeight + 1)
+        .map(p => (p.querySelector('.num') || p.querySelector('h1') || {}).textContent);
+      document.body.dataset.overflow = over.join('|') || 'none';
+      document.body.dataset.ready = '1';
+    });
   }
   document.fonts.load('100px Andika').then(() => document.fonts.ready).then(build);
 })();

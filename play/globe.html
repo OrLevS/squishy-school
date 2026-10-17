@@ -57,6 +57,7 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/continents.js"></script>
 <script>
 const mode = new URLSearchParams(location.search).get('m') || 'toss';
 document.getElementById('back').href = `../w${weekNo()}/`;
@@ -86,7 +87,7 @@ let extraDraw = null;  // פונקציה לציור נוסף (רוסיה האס�
 // מרכז החזית של הכדור (לבדיקה אם נקודה נראית), בלי invert שאין להטלה המשולבת
 const front = () => { const r = projection.rotate(); return [-r[0], -r[1]]; };
 const seen = ll => { const c = projection.clipAngle(); return !c || d3.geoDistance(ll, front()) < c * Math.PI / 180; };
-function render() {
+let render = function () {
   // בזמן השיטוח הים ממלא את כל המסגרת, כמו במפה
   gOcean.attr('d', projection.clipAngle() === 90 ? path({ type: 'Sphere' }) : `M0,0H${W}V${H}H0Z`);
   gGrat.attr('d', path(graticule));
@@ -275,7 +276,7 @@ function modeFlat() {
 // =========================================================
 //  3. הכתובת שלי
 // =========================================================
-const ASIA = ['004','051','031','048','050','064','096','116','156','196','268','356','360','364','368','376','392','400','398','414','417','418','422','458','496','104','524','408','512','586','275','608','634','682','410','144','760','158','762','764','626','792','795','784','860','704','887'];
+const ASIA = CONT.ASIA;
 function modeAddress() {
   $('title').textContent = 'הכתובת שלי';
   $('lead').textContent = 'יוצאים מהבית, צעד אחרי צעד, עד שרואים את כל כדור הארץ.';
@@ -316,6 +317,111 @@ function modeAddress() {
   highlights = { '376': 'hl-main' };
   go(0);
 }
+// =========================================================
+//  4. שבע היבשות
+// =========================================================
+const CONT_COLORS = { asia: '#F4A261', africa: '#E9C46A', europe: '#2A9D8F', namerica: '#E76F51', samerica: '#264653', oceania: '#5A2A0C', antarctica: '#ffffff' };
+function modeContinents() {
+  $('title').textContent = 'שבע היבשות';
+  $('lead').textContent = 'יבשת היא חתיכת יבשה ענקית, שיש בה הרבה מדינות. כמה כאלה יש?';
+  $('crumb').textContent = 'מדעים · מפגש 3';
+  spinning = false;
+  // מפה שטוחה: רואים את כל היבשות בבת אחת
+  svg.attr('viewBox', '0 0 600 320');
+  projection = d3.geoNaturalEarth1().fitExtent([[8, 8], [592, 312]], { type: 'Sphere' });
+  path = d3.geoPath(projection);
+  svg.on('.drag', null);
+  const pieces = CONT.explode(countries);
+  const found = new Set();
+  let guessN = null, stage = 'guess';
+  const IL = [35, 31.5];
+
+  function paint() {
+    gOcean.attr('d', path({ type: 'Sphere' }));
+    gGrat.attr('d', path(graticule));
+    gLand.selectAll('path').data(pieces).join('path')
+      .attr('class', 'country')
+      .attr('d', path)
+      .style('fill', d => {
+        const k = d.cont === 'russia' ? null : d.cont;
+        if (stage === 'israel-done' && k !== 'asia') return '#E6D3B9';
+        return k && found.has(k) ? CONT_COLORS[k] : '#E6D3B9';
+      })
+      .style('stroke', d => d.cont === 'antarctica' && found.has('antarctica') ? '#9a9a9a' : null)
+      .style('cursor', stage === 'count' ? 'pointer' : null)
+      .on('click', (e, d) => { if (stage === 'count') tap(d.cont === 'russia' ? russiaSide(e) : d.cont); });
+    gExtra.html('');
+    // רוסיה: מערב = אירופה, מזרח = אסיה
+    const ru = pieces.find(c => c.cont === 'russia');
+    if (ru) [['europe', false], ['asia', true]].forEach(([k, east]) => {
+      const id = 'ru-' + k;
+      gExtra.append('clipPath').attr('id', id).append('path').attr('d', path(CONT.russiaClip(east)));
+      const show = found.has(k) && !(stage === 'israel-done' && k !== 'asia');
+      gExtra.append('path').attr('clip-path', `url(#${id})`).attr('d', path(ru))
+        .attr('fill', show ? CONT_COLORS[k] : '#E6D3B9').attr('stroke', '#FBF5ED').attr('stroke-width', .5)
+        .style('cursor', stage === 'count' ? 'pointer' : null)
+        .on('click', () => { if (stage === 'count') tap(k); });
+    });
+    gExtra.append('path').attr('d', path(CONT.URALS)).attr('fill', 'none').attr('stroke', '#264653').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 4').style('pointer-events', 'none');
+    gLabels.html('');
+    found.forEach(k => {
+      if (stage === 'israel-done' && k !== 'asia') return;
+      const p = projection(CONT.LABEL_AT[k]);
+      gLabels.append('text').attr('class', 'lbl').attr('x', p[0]).attr('y', p[1]).attr('text-anchor', 'middle').text(CONT.NAMES[k]);
+    });
+    if (stage.startsWith('israel')) {
+      const p = projection(IL);
+      gLabels.append('g').attr('transform', `translate(${p})`).html(
+        `<circle r="7" fill="#E76F51" stroke="#fff" stroke-width="3"/><text x="-12" y="-10" class="lbl" text-anchor="end" style="font-size:16px">ישראל</text>`);
+    }
+  }
+  function russiaSide(e) {
+    const [lon] = projection.invert(d3.pointer(e, svg.node()));
+    return lon > 60 ? 'asia' : 'europe';
+  }
+  function tap(k) {
+    if (!k || found.has(k)) return;
+    found.add(k); paint();
+    $('cnt').textContent = found.size;
+    $('msg').textContent = CONT.NAMES[k] + '!';
+    bounce($('sq').firstElementChild);
+    if (found.size === 7) setTimeout(doneCount, 600);
+  }
+  function askCount() {
+    side.innerHTML = `<div class="card guess"><h2>🤔 קודם מנחשים</h2><div>כמה יבשות יש על כדור הארץ?</div>
+      <div class="btn-row" style="margin:6px 0 0">${[3, 4, 5, 6, 7, 8, 9].map(n => `<button class="btn alt" data-n="${n}" style="padding:8px 16px">${n}</button>`).join('')}</div></div>`;
+    side.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { guessN = +b.dataset.n; startCount(); });
+  }
+  function startCount() {
+    stage = 'count';
+    side.innerHTML = `<div class="card"><h2>👆 נוגעים בכל יבשת</h2>
+      <p>כל יבשת שמוצאים מקבלת צבע ושם. מוצאים את כולן!</p>
+      <p class="hint" style="margin-top:8px">💡 אירופה ואסיה מחוברות. הקו המקווקו הוא הגבול שאנשים קבעו ביניהן.</p></div>
+      <div class="count"><div>מצאת<b id="cnt">0</b></div></div>
+      <div class="msg" id="msg"></div><div style="text-align:center" id="sq">${squishySVG('#E9C46A', 70)}</div>`;
+    paint();
+  }
+  function doneCount() {
+    stage = 'israel';
+    paint();
+    side.innerHTML = `<div class="result"><h2>${guessN === 7 ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>
+      <p>יש <b>7 יבשות</b>. ${guessN === 7 ? '' : `ניחשת ${guessN}, וזה בדיוק מה שעוזר לזכור.`}</p></div>
+      <div class="card guess"><h2>🤔 ועכשיו: ישראל ●</h2><div>באיזו יבשת נמצאת ישראל?</div>
+      ${CONT.KEYS.filter(k => k !== 'antarctica').map(k => `<button class="btn alt" data-k="${k}">${CONT.NAMES[k]}</button>`).join('')}</div>`;
+    side.querySelectorAll('[data-k]').forEach(b => b.onclick = () => revealIsrael(b.dataset.k));
+  }
+  function revealIsrael(k) {
+    stage = 'israel-done'; paint();
+    side.innerHTML = `<div class="result"><h2>${k === 'asia' ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>
+      <p>ישראל נמצאת ב<b>אסיה</b>. ממש בקצה שלה, ליד אפריקה וליד אירופה.</p>
+      ${k === 'asia' ? '' : `<p>ניחשת ${CONT.NAMES[k]}. זה הגיוני: היא קרובה מאוד!</p>`}
+      <div class="btn-row"><button class="btn teal" id="again">🔁 עוד פעם</button></div></div>`;
+    $('again').onclick = () => { found.clear(); stage = 'guess'; paint(); askCount(); };
+  }
+  render = paint;
+  askCount();
+}
+
 function overlay(icon, title, text) {
   const o = $('overlay');
   if (!icon) { o.hidden = true; return; }
@@ -342,7 +448,7 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then
   countries = topojson.feature(world, world.objects.countries).features;
   land = topojson.feature(world, world.objects.land);
   countries.forEach(c => byId[c.id] = c);
-  ({ toss: modeToss, flat: modeFlat, address: modeAddress }[mode] || modeToss)();
+  ({ toss: modeToss, flat: modeFlat, address: modeAddress, continents: modeContinents }[mode] || modeToss)();
   render();
 }).catch(() => { $('lead').textContent = 'לא הצלחנו לטעון את המפה. בודקים שיש אינטרנט ומרעננים.'; });
 </script>
