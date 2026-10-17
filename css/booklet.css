@@ -153,7 +153,7 @@ h2.sec { font-family: var(--title); font-weight: normal; font-size: 15pt; margin
 .cb .for { position: absolute; bottom: 2mm; inset-inline-end: 3mm; font-size: 7.5pt; color: var(--soft); }
 .cb.flip { transform: rotate(180deg); }
 
-.labels { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2mm; }
+.labels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm; }
 .labels div { border: .4mm dashed var(--soft); border-radius: 2mm; padding: 2mm 1mm; text-align: center; font-size: 9pt; }
 .labels b { font-family: var(--title); font-weight: normal; font-size: 16pt; display: block; }
 
@@ -235,3 +235,86 @@ table.track .en { font-size: 15pt; }
 .act-list a { display: flex; gap: 3mm; align-items: center; background: #fff; border-radius: 5mm; padding: 3mm 4mm; border: .5mm solid var(--beige); }
 .act-list .ic { font-size: 18pt; }
 @media print { .mom-color .flow { outline: none; } }
+
+/* ---------- מפגש בעמוד אחד ---------- */
+.sess .goal { font-family: var(--title); font-size: 15pt; line-height: 1.3; margin-bottom: 3mm; }
+.sess .prep2 { display: flex; flex-wrap: wrap; gap: 1.5mm; align-items: center; font-size: 10.5pt; margin-bottom: 3mm; }
+.sess .prep2 > b { font-family: var(--title); font-weight: normal; font-size: 12pt; margin-inline-end: 1mm; }
+.st.chip { font-size: 10pt; border: .35mm solid var(--line); border-radius: 99px; padding: .2mm 3mm; display: inline-block; }
+.sess .part { border-inline-start: 1.6mm solid var(--ink); padding: 1.5mm 4mm 1.5mm 3mm; margin-bottom: 2.5mm; border-radius: 3mm; }
+.sess .part h3 { font-family: var(--title); font-weight: normal; font-size: 13.5pt; display: flex; gap: 2mm; align-items: center; margin-bottom: 1mm; }
+.sess .part h3 .min { font-family: var(--he); font-size: 9.5pt; border: .35mm solid var(--line); border-radius: 99px; padding: 0 2mm; }
+.sess ol { margin: 0; padding-inline-start: 6mm; font-size: 11pt; }
+.sess ol.plain { list-style: none; padding-inline-start: 0; }
+.sess li { margin: 1.2mm 0; }
+.sess li .sh { font-weight: 700; margin-inline-end: 1.5mm; }
+.sess li .st { margin: .5mm 0; }
+.sess li .st.say { display: inline; padding: .4mm 2.5mm; line-height: 1.9; }
+.sess li .do2 { display: block; }
+.sess li .refs { display: flex; flex-wrap: wrap; gap: 1.5mm; margin-top: .8mm; }
+.sess li .refs .st.ref { margin: 0; font-size: 9.5pt; }
+.sess .breath { font-size: 10pt; text-align: center; margin: -1mm 0 2.5mm; color: var(--soft); }
+.sess .endrow { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 1mm; }
+.sess .enough, .sess .more { border-radius: 4mm; padding: 2.5mm 4mm; font-size: 10.5pt; }
+.sess .enough b, .sess .more b { display: block; font-family: var(--title); font-weight: normal; font-size: 12pt; margin-bottom: .5mm; }
+.sess .enough { border: .5mm solid var(--ink); }
+.sess .more { border: .5mm dashed var(--line); }
+.sess .more .st.ref { font-size: 9.5pt; margin-top: 1mm; }
+.sess .after { font-size: 10pt; margin-top: 2.5mm; display: flex; gap: 2mm; align-items: center; flex-wrap: wrap; }
+
+.mom-color .page { background: var(--cream); outline-color: var(--cream); }
+.mom-color .sess .goal { color: var(--navy); }
+.mom-color .sess .prep2 > b { color: var(--coral); }
+.mom-color .st.chip { background: #fff; border-color: var(--beige); color: var(--brown); }
+.mom-color .sess .part { background: #fff; border-inline-start-color: var(--c); }
+.mom-color .sess .part h3 { color: var(--c); }
+.mom-color .sess .part[data-k=open] { --c: var(--coral); }
+.mom-color .sess .part[data-k=science] { --c: var(--navy); }
+.mom-color .sess .part[data-k=english] { --c: var(--teal); }
+.mom-color .sess .part[data-k=close] { --c: var(--brown); }
+.mom-color .sess .part h3 .min { border-color: var(--beige); color: var(--brown); }
+.mom-color .sess li::marker { color: var(--c); font-weight: 700; }
+.mom-color .sess .enough { background: var(--teal); color: #fff; border: 0; }
+.mom-color .sess .enough b { color: var(--gold); }
+.mom-color .sess .more { background: #fff; border-color: var(--sand); }
+.mom-color .sess .more b { color: var(--sand); }
+.mom-color .sess .breath { color: var(--sand); }
+.mom-color .st.ref.act2 { border-color: var(--coral); color: var(--coral); }
+.mom-color .before { background: #fff; border-radius: 5mm; padding: 3mm 5mm; margin-bottom: 4mm; font-size: 10.5pt; border: .5mm solid var(--beige); }
+.mom-color .before b.t { font-family: var(--title); font-weight: normal; font-size: 13pt; color: var(--coral); display: block; margin-bottom: 1mm; }
+.mom-color .before ol { padding-inline-start: 5mm; }
+.mom-color .before li { margin: .8mm 0; }
+/* צפוף יותר: צעד = שורה זורמת אחת (כותרת, מה אומרים, מה עושים, קישורים) */
+.sess ol { font-size: 10.5pt; line-height: 1.45; }
+.sess li { margin: .9mm 0; }
+.sess li .do2 { display: inline; margin-inline-start: 1mm; }
+.sess li .refs { display: inline-flex; margin: 0 1.5mm 0 0; vertical-align: middle; }
+.sess li .st.say { line-height: 1.6; }
+.sess .part { padding: 1.2mm 3.5mm 1.2mm 3mm; margin-bottom: 2mm; }
+.sess .part h3 { font-size: 12.5pt; margin-bottom: .5mm; }
+.sess .goal { font-size: 14pt; margin-bottom: 2mm; }
+.sess .prep2 { margin-bottom: 2.5mm; }
+.sess .breath { margin: -.5mm 0 2mm; font-size: 9.5pt; }
+.sess ol { font-size: 11.5pt; line-height: 1.55; }
+.sess li { margin: 1.4mm 0; }
+.sess .part { padding: 2mm 4mm 2mm 3mm; margin-bottom: 3mm; }
+.sess .part h3 { font-size: 13.5pt; margin-bottom: 1mm; }
+.sess .goal { font-size: 15pt; margin-bottom: 3mm; }
+/* כותרת הצעד בולטת, ומה עושים בשורה משלו */
+.sess ol { font-size: 11pt; line-height: 1.5; }
+.sess li .sh { font-family: var(--title); font-weight: normal; font-size: 12pt; }
+.mom-color .sess li .sh { color: var(--c); }
+.sess li .do2 { display: block; margin: .3mm 0 0; }
+.sess li .do2 + .refs, .sess li .say + .refs { display: inline-flex; }
+.sess li .refs { margin-top: .6mm; }
+.sess li::after { content: ""; display: block; clear: both; }
+.sess li .refs { float: left; margin: .2mm 0 0 0; }
+.sess ol { font-size: 10.8pt; }
+/* דף העזר של האנגלית: עמוד אחד */
+.mom-color #english h2.sec { margin: 2.5mm 0 1.2mm; font-size: 13pt; }
+.mom-color #english table.pron td, .mom-color #english table.pron th { padding: .7mm 2mm; font-size: 10pt; }
+.mom-color #english table.pron .L { font-size: 16pt; }
+.mom-color #english table.pron .H { font-size: 14pt; }
+.mom-color #english .note { margin: 2mm 0; font-size: 10pt; }
+.mom-color .cover-mom .hero { margin-bottom: 3mm; }
+.mom-color .cover-mom h2.sec { margin: 3mm 0 1.5mm; }

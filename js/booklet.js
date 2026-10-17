@@ -192,14 +192,19 @@
         <span class="go">פותחים ↗</span>
       </a>
       <div class="sentence">משפט השבוע: <span class="en">${esc(W.sentence)}</span></div>
+      <div class="before"><b class="t">לפני שמתחילות (פעם אחת בשבוע)</b><ol>
+        <li>מדפיסות את הדפים של הילדה (הכפתור הכחול למעלה).</li>
+        <li>גוזרות את כרטיסי הקופסה ומקפלות: ${pageRef(kid('cards'))}</li>
+        <li>מכינות קופסת נעליים לכרטיסים, ומקום לערמת "עוד לא".</li>
+        <li>אם עוד לא קראת: <a class="st ref" href="${SITE.base}pdf/${encodeURIComponent('מדריך-לאמא-צבע.pdf')}">📘 למה השיעור בנוי ככה ↗</a></li>
+      </ol></div>
       <h2 class="sec">📅 המפגשים</h2>
       <div class="sess-list">
         <a href="#english"><b>🔤</b><span>האנגלית של השבוע<br><small>איך מבטאים · לקרוא לפני מפגש 1</small></span></a>
-        ${W.sessions.map(s => `<a href="#s${s.n}"><b>${s.n}</b><span>${esc(s.title)}<br><small>${s.blocks.reduce((a, b) => a + b.min, 0)} דק׳</small></span></a>`).join('')}
+        ${W.sessions.map(s => `<a href="#s${s.n}"><b>${s.n}</b><span>${esc(s.title)}<br><small>60 דק׳</small></span></a>`).join('')}
       </div>
       <h2 class="sec">📱 הפעילויות של השבוע</h2>
       <div class="act-list">${W.links.map(l => `<a href="${url(l.path)}"><span class="ic">${l.icon}</span><span><b>${tx(l.title)}</b><br><small>${esc(l.desc)} · ${l.session ? 'מפגש ' + l.session : 'כל השבוע'}</small></span></a>`).join('')}</div>
-      <div class="golden"><div>⏳ מחכים 5 שניות לפני שעוזרים</div><div>🔍 "בואי נבדוק" במקום "לא נכון"</div><div>⭐ משבחים את הדרך, לא את התוצאה</div></div>
     </section>`;
   }
 
@@ -220,10 +225,6 @@
       <table class="pron"><tr><th>אות</th><th>צליל</th><th>איך</th></tr>
         ${W.sounds.map(s => `<tr><td class="L">${s.l}</td><td class="H">${s.he}</td><td>${esc(s.tip)}</td></tr>`).join('')}
       </table>
-      <h2 class="sec">📖 מילים שמרכיבים מהצלילים</h2>
-      <div style="display:flex;flex-wrap:wrap;gap:2mm 6mm;font-size:11pt">
-        ${W.words.map(w => `<span><span class="en" style="font-size:15pt">${w.w}</span> = ${w.he}</span>`).join('')}
-      </div>
       <h2 class="sec">♥ מילות לב</h2>
       <div style="font-size:10.5pt;margin-bottom:1.5mm">מילים שקוראים הרבה, אבל לא לגמרי לפי החוקים. החלק ה"משוגע" מקבל ♥, ואותו זוכרים בעל־פה.</div>
       <table class="pron"><tr><th>מילה</th><th>הגייה</th><th>פירוש</th><th>שימו לב</th></tr>
@@ -242,40 +243,48 @@
   // =====================================================================
   //  3. מדריך אמא למפגש
   // =====================================================================
-  const BLK = {
-    recall: ['🔁', true], sounds: ['🔤'], talk: ['🗣'], move: ['🤸', false, true],
-    science: ['🌍'], write: ['✏️'], lock: ['🔒', true]
-  };
-  function step(s) {
-    if (s.say) return `<div class="say-wrap"><span class="st say">${tx(s.say)}</span></div>`;
-    if (s.do) return `<div class="st do">${tx(s.do)}</div>`;
-    if (s.if) return `<div class="st if"><b>${tx(s.if)}</b> ${tx(s.then)}</div>`;
-    if (s.page) return pageRef(kid(s.page));
-    if (s.qr) {
-      const l = link(s.qr);
-      if (MOM) return `<a class="st act" href="${url(l.path)}"><span class="qr-inline">${qr(l.path)}</span><span><b>${l.icon} ${tx(l.title)}</b><br><span class="open">פותחים את הפעילות ↗</span></span></a>`;
-      return `<div class="st" style="display:flex;align-items:center;gap:3mm"><span class="qr-inline">${qr(l.path)}</span><span><b>${l.icon} <bdi>${esc(l.title)}</bdi></b><br><span style="font-size:9.5pt" class="en">${SITE.short}${l.path}</span></span></div>`;
-    }
-    return '';
+  // החלקים של המפגש. אם יש כרטיסים להוציא, הפתיחה היא הקופסה.
+  function partsOf(s) {
+    if (!s.cards.length) return s.parts;
+    return [{ k: 'open', min: 5, title: 'פותחות: הקופסה', steps: [
+      { do: `מוציאות את כרטיסים ${s.cards.join(', ')} ואת ערמת "עוד לא". את שואלת, והיא עונה בלי להציץ. ידעה ← חוזר לקופסה. עוד לא ← לערמת "עוד לא".` }
+    ]}].concat(s.parts);
+  }
+  const PART_IC = { open: '🫧', science: '🌍', english: '🔤', close: '✏️' };
+  function sstep(x, i) {
+    const refs = [x.page ? pageRef(kid(x.page)) : '', x.qr ? actRef(link(x.qr)) : ''].join('');
+    return `<li>${x.h ? `<b class="sh">${esc(x.h)}</b>` : ''}
+      ${x.say ? `<span class="st say">${tx(x.say)}</span>` : ''}
+      ${refs ? `<span class="refs">${refs}</span>` : ''}
+      ${x.do ? `<span class="st do2">${tx(x.do)}</span>` : ''}</li>`;
+  }
+  function actRef(l) {
+    return MOM
+      ? `<a class="st ref act2" href="${url(l.path)}">${l.icon} ${tx(l.title)} ↗</a>`
+      : `<span class="st ref">${l.icon} ${tx(l.title)}</span>`;
   }
   function session(s) {
-    const total = s.blocks.reduce((a, b) => a + b.min, 0);
-    return `<section class="flow mom" id="s${s.n}">
-      <div class="ph"><span class="who mom">לאמא</span><h1>מפגש ${s.n}: ${esc(s.title)}</h1><span class="st ref" style="margin:0">⏱ ${total} דק׳</span></div>
-      <div class="progress">${s.blocks.map(b => `<span>${BLK[b.k][0]} ${b.min}׳</span>`).join('')}</div>
-      ${(() => {
-        const ids = [...new Set(s.blocks.flatMap(b => b.steps.filter(x => x.page).map(x => x.page)))];
-        return ids.length ? `<div class="pages-strip"><b>📄 הדפים למפגש הזה:</b> ${ids.map(id => pageRef(kid(id))).join('')}</div>` : '';
-      })()}
-      <div class="prep"><b>מה להכין</b><ul>${s.prep.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>
-      <div class="golden"><div>⏳ מחכים 5 שניות לפני שעוזרים</div><div>🔍 "בואי נבדוק" במקום "לא נכון"</div><div>⭐ משבחים את הדרך, לא את התוצאה</div></div>
-      ${s.blocks.map(b => `
-        <div class="blk ${BLK[b.k][2] ? 'light' : ''}" data-k="${b.k}">
-          <h3>${BLK[b.k][0]} ${tx(b.title)} <span class="min">${b.min} דק׳</span>${BLK[b.k][1] ? '<span class="must">לא מדלגים</span>' : ''}</h3>
-          ${b.steps.map(step).join('')}
-        </div>`).join('')}
+    const parts = partsOf(s);
+    const total = parts.reduce((a, b) => a + b.min, 0) + 3;
+    const prep = s.prep.map(p => p.pages ? p.pages.map(id => pageRef(kid(id))).join('') : `<span class="st chip">${esc(p.t)}</span>`).join('');
+    return `<section class="page sess" id="s${s.n}">
+      <div class="ph"><span class="who mom">לאמא</span><h1>מפגש ${s.n}: ${esc(s.title)}</h1><span class="st chip">⏱ ${total} דק׳</span></div>
+      <div class="goal">${tx(s.goal)}</div>
+      <div class="prep2"><b>מה נכין</b> ${prep}</div>
+      ${parts.map((p, pi) => `
+        <div class="part" data-k="${p.k}">
+          <h3><span class="pi">${PART_IC[p.k]}</span> ${tx(p.title)} <span class="min">${p.min} דק׳</span></h3>
+          <ol class="${p.steps.length === 1 || !p.steps[0].h ? 'plain' : ''}">${p.steps.map(sstep).join('')}</ol>
+        </div>${pi === 1 ? '<div class="breath">🤸 הפסקת תנועה, 3 דקות</div>' : ''}`).join('')}
+      <div class="endrow">
+        <div class="enough"><b>✅ זה מספיק להיום</b>${tx(s.enough)}</div>
+        <div class="more"><b>➕ אם יש כוח</b>${tx(s.more.t)} ${s.more.qr ? actRef(link(s.more.qr)) : ''}${s.more.page ? pageRef(kid(s.more.page)) : ''}</div>
+      </div>
+      ${s.after ? `<div class="after">📝 ${tx(s.after)} ${pageRef(kid('tracker'))}</div>` : ''}
+      ${footer('')}
     </section>`;
   }
+
 
   // =====================================================================
   //  4. דפי הילדה
@@ -339,8 +348,8 @@
     </div>`;
     const first = W.cards.slice(0, 6), rest = W.cards.slice(6);
     const ins = `<div class="ins" style="margin-bottom:3mm;font-size:11pt">✂️ גוזרים לאורך הקו המקווקו · מקפלים באמצע · מדביקים. השאלה מצד אחד, התשובה מהצד השני. 🖍 צובעים את הסקווישי.</div>`;
-    const labels = `<h2 class="sec" style="margin-top:1mm">✂️ תוויות לתאים בקופסה</h2>
-      <div class="labels">${['כל מפגש', 'מפגש כן, מפגש לא', 'פעם בשבוע', 'פעם בשבועיים', 'פעם בחודש'].map((t, i) => `<div><b>${i + 1}</b>${t}</div>`).join('')}<div><b>🏆</b>צנצנת האלופים</div></div>`;
+    const labels = `<h2 class="sec" style="margin-top:1mm">✂️ תוויות: לקופסה ולערמת "עוד לא"</h2>
+      <div class="labels">${[['🫧', 'קופסת הסקווישים'], ['⏳', 'עוד לא'], ['🫧', 'קופסת הסקווישים'], ['⏳', 'עוד לא']].map(([ic, t]) => `<div><b>${ic}</b>${t}</div>`).join('')}</div>`;
     return page('kid', k.title, k.no, ins + first.map(row).join('')) +
       page('kid', k.title + ' (המשך)', k.no + 1, rest.map(row).join('') + labels);
   };
@@ -434,19 +443,10 @@
   `);
 
   P['tracker'] = k => page('mom', 'דף מעקב · שבוע ' + W.n, k.no, `
-    <div class="ins" style="font-size:11pt;margin-bottom:3mm">ממלאות בסוף מפגש 4. אחר כך מצלמות ושולחות. לפי הדף הזה מתאימים את השבוע הבא.</div>
-    <h2 class="sec" style="margin-top:0">🔤 צלילים</h2>
-    <table class="track"><tr><th></th>${W.track.sounds.map(s => `<th class="en" style="font-size:16pt">${s}</th>`).join('')}</tr>
-      ${['יודעת', 'בדרך', 'עוד לא'].map(r => `<tr><th>${r}</th>${W.track.sounds.map(() => '<td>☐</td>').join('')}</tr>`).join('')}</table>
-    <h2 class="sec">📖 מילים שקראה לבד</h2>
-    <table class="track"><tr>${W.track.words.map(w => `<td><span class="en">${w}</span> ☐</td>`).join('')}</tr></table>
-    <h2 class="sec">📅 המפגשים</h2>
-    <table class="track"><tr><th>מפגש</th><th>איך היה?</th><th>מה היה קשה?</th></tr>
-      ${W.sessions.map(s => `<tr><td>${s.n}</td><td style="font-size:15pt;white-space:nowrap">😊 😐 😓</td><td style="height:12mm;width:65%"></td></tr>`).join('')}</table>
-    <h2 class="sec">🫧 קופסת הסקווישים</h2>
-    <div class="starter">כרטיסים שעדיין בתא 1: <span class="blank" style="min-width:100mm"></span></div>
-    <h2 class="sec">✏️ ומה עוד?</h2>
-    <div class="starter">משהו שהפתיע אותי השבוע:</div>${lines(3)}
+    <div class="ins" style="font-size:12pt;margin-bottom:5mm">שלוש שאלות בסוף השבוע. אחר כך מצלמות את הדף הזה ואת דף ${kid('w-sentence').no}, ושולחות.</div>
+    ${[['💪', 'מה היא הצליחה להסביר או לעשות לבד?'], ['🤝', 'איפה היא צריכה עזרה?'], ['✨', 'מה עניין אותה?']].map(([ic, q], i) => `
+      <div class="task"><div class="verb"><span class="n">${i + 1}</span><span class="ic">${ic}</span><b>${q}</b></div>${lines(4)}</div>`).join('')}
+    <div class="task"><div class="verb"><span class="n">4</span><span class="ic">🫧</span><b>כרטיסים שנשארו בערמת "עוד לא":</b></div>${lines(1)}</div>
   `);
 
   // =====================================================================

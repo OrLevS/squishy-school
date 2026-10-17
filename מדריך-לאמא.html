@@ -226,74 +226,54 @@ p + p { margin-top: 2mm; }
     <div class="tool-head">
       <div class="ico">🫧</div>
       <h3>קופסת הסקווישים</h3>
-      <span class="tag">כל מפגש · 5 דקות · עד 10 כרטיסים</span>
+      <span class="tag">פתיחת המפגש · 5 דקות</span>
     </div>
     <dl class="rows">
-      <dt>מה עושים</dt><dd>כל שיעור משאיר כמה כרטיסי זיכרון קטנים. הם נכנסים לקופסה עם 5 תאים, וכל כרטיס עובר בין התאים לפי מה שהיא זוכרת.</dd>
+      <dt>מה עושים</dt><dd>כל שיעור משאיר כמה כרטיסי זיכרון קטנים. בתחילת כל מפגש המדריך אומר בדיוק אילו כרטיסים מוציאים היום. מה שהיא יודעת חוזר לקופסה, ומה שעוד לא עובר לערמת "עוד לא".</dd>
       <dt>למה</dt><dd>שוכחים הכי מהר בימים הראשונים אחרי שלומדים. חזרה בדיוק כשמתחילים לשכוח "מאפסת" את השכחה, והפעם היא תהיה איטית יותר. חמש דקות מפוזרות על פני שבועות שוות יותר משעה אחת ברצף.</dd>
       <dt>הפיתוי</dt><dd class="temp">לדלג על כרטיס כי "היא ידעה את זה אתמול", או לעבור על כל הכרטיסים בבת אחת.</dd>
-      <dt>במקום</dt><dd class="instead">לעבור רק על התאים של היום. הקופסה כבר מחליטה מתי לחזור על מה.</dd>
+      <dt>במקום</dt><dd class="instead">להוציא רק את הכרטיסים שכתובים במדריך, ואת ערמת "עוד לא". החישוב מתי לחזור על מה כבר נעשה בשבילך.</dd>
     </dl>
 
     <div class="box-diagram">
-      <svg viewBox="0 0 720 236" role="img" aria-label="חמשת התאים של הקופסה: כרטיס שהיא יודעת עובר תא קדימה, כרטיס שעוד לא חוזר לתא 1">
+      <svg viewBox="0 0 720 200" role="img" aria-label="המדריך אומר אילו כרטיסים להוציא. ידעה: הכרטיס חוזר לקופסה. עוד לא: לערמת עוד לא, שחוזרת במפגש הבא">
         <style>
           .bx { font-family: Pogo, Mush, sans-serif; }
           .sm { font-family: Mush, sans-serif; font-size: 15px; fill: #264653; }
         </style>
-        <!-- arrow back to box 1 -->
-        <path d="M120 160 Q360 206 600 160" stroke="#E76F51" stroke-width="3" fill="none" stroke-dasharray="7 6" marker-end="url(#ah-c)"/>
         <defs>
           <marker id="ah-c" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#E76F51"/></marker>
           <marker id="ah-t" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2A9D8F"/></marker>
         </defs>
-        <text x="360" y="226" text-anchor="middle" class="sm" style="fill:#E76F51">עוד לא? הכרטיס חוזר לתא 1. בלי דרמה, ככה הקופסה עובדת.</text>
-
-        <!-- boxes, right to left -->
         <g class="bx">
-          <g transform="translate(600 40)">
-            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
-            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#E76F51">1</text>
-            <text x="0" y="56" text-anchor="middle" class="sm">כל מפגש</text>
-            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#E76F51"/>
+          <!-- המדריך (ימין) -->
+          <g transform="translate(600 20)">
+            <rect x="-90" y="0" width="180" height="120" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="34" text-anchor="middle" font-size="20" fill="#E76F51">📗 המדריך</text>
+            <text x="0" y="64" text-anchor="middle" class="sm">"היום מוציאות</text>
+            <text x="0" y="86" text-anchor="middle" class="sm">כרטיסים 1, 6, 9"</text>
           </g>
-          <g transform="translate(480 40)">
-            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
-            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#F4A261">2</text>
-            <text x="0" y="56" text-anchor="middle" class="sm">מפגש כן,</text>
-            <text x="0" y="74" text-anchor="middle" class="sm">מפגש לא</text>
-            <use href="#squishy" x="-14" y="80" width="28" height="25" style="color:#F4A261"/>
+          <!-- כרטיס (מרכז) -->
+          <g transform="translate(360 30)">
+            <use href="#squishy" x="-30" y="0" width="60" height="55" style="color:#E9C46A"/>
+            <text x="0" y="84" text-anchor="middle" class="sm">היא עונה</text>
+            <text x="0" y="104" text-anchor="middle" class="sm">בלי להציץ</text>
           </g>
-          <g transform="translate(360 40)">
-            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
-            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#c9a443">3</text>
-            <text x="0" y="56" text-anchor="middle" class="sm">פעם בשבוע</text>
-            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#E9C46A"/>
+          <path d="M505 80 L410 80" stroke="#264653" stroke-width="3" fill="none" marker-end="url(#ah-t)"/>
+          <!-- שתי תוצאות (שמאל) -->
+          <path d="M310 55 Q260 30 215 40" stroke="#2A9D8F" stroke-width="3" fill="none" marker-end="url(#ah-t)"/>
+          <path d="M310 105 Q260 135 215 135" stroke="#E76F51" stroke-width="3" fill="none" stroke-dasharray="7 6" marker-end="url(#ah-c)"/>
+          <g transform="translate(110 10)">
+            <rect x="-95" y="0" width="190" height="62" rx="16" fill="#fff" stroke="#2A9D8F" stroke-width="3"/>
+            <text x="0" y="26" text-anchor="middle" font-size="17" fill="#2A9D8F">✓ ידעה</text>
+            <text x="0" y="48" text-anchor="middle" class="sm">חוזר לקופסה</text>
           </g>
-          <g transform="translate(240 40)">
-            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
-            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#2A9D8F">4</text>
-            <text x="0" y="56" text-anchor="middle" class="sm">פעם</text>
-            <text x="0" y="74" text-anchor="middle" class="sm">בשבועיים</text>
-            <use href="#squishy" x="-14" y="80" width="28" height="25" style="color:#2A9D8F"/>
+          <g transform="translate(110 105)">
+            <rect x="-95" y="0" width="190" height="62" rx="16" fill="#fff" stroke="#E76F51" stroke-width="3" stroke-dasharray="7 5"/>
+            <text x="0" y="26" text-anchor="middle" font-size="17" fill="#E76F51">⏳ עוד לא</text>
+            <text x="0" y="48" text-anchor="middle" class="sm">חוזר במפגש הבא</text>
           </g>
-          <g transform="translate(120 40)">
-            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
-            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#264653">5</text>
-            <text x="0" y="56" text-anchor="middle" class="sm">פעם בחודש</text>
-            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#264653"/>
-          </g>
-          <!-- forward arrows -->
-          <g stroke="#2A9D8F" stroke-width="3" fill="none" marker-end="url(#ah-t)">
-            <path d="M546 95 L538 95"/><path d="M426 95 L418 95"/><path d="M306 95 L298 95"/><path d="M186 95 L178 95"/>
-          </g>
-          <text x="360" y="22" text-anchor="middle" class="sm" style="fill:#2A9D8F">ידעה? הכרטיס עובר תא אחד שמאלה</text>
-          <!-- hall of fame -->
-          <g transform="translate(30 70)">
-            <text x="0" y="0" text-anchor="middle" font-size="26">🏆</text>
-            <text x="0" y="26" text-anchor="middle" class="sm">צנצנת</text>
-            <text x="0" y="44" text-anchor="middle" class="sm">האלופים</text>
-          </g>
+          <text x="360" y="192" text-anchor="middle" class="sm" style="fill:#E76F51">"עוד לא" זה לא כישלון. ככה הקופסה עובדת.</text>
         </g>
       </svg>
     </div>
@@ -339,25 +319,24 @@ p + p { margin-top: 2mm; }
     <div class="rule"><div class="n">★</div><div class="t">לשבח את הדרך</div><div class="s">"ראיתי שניסית להיזכר" ולא "את חכמה". ככה היא לומדת מה עוזר.</div></div>
   </div>
 
-  <h2>ביום קשה: מה גמיש ומה לא</h2>
+  <h2>ביום קצר: מה מספיק</h2>
   <div class="two-col">
     <div class="panel flex-panel">
       <h3 style="color:var(--brown)">אפשר לקצר או לוותר</h3>
       <ul>
-        <li>הסרטון</li>
-        <li>הפעילות העצמאית</li>
-        <li>דף תרגול נוסף</li>
-        <li>אורך השיחה</li>
+        <li>"אם יש כוח"</li>
+        <li>הנושא הקצר של המפגש</li>
+        <li>המשחקים באתר</li>
         <li>אורך משפט הכתיבה</li>
       </ul>
     </div>
     <div class="panel fixed-panel">
-      <h3>לא מדלגים, גם בגרסה קצרה</h3>
+      <h3>המינימום שעדיין עובד</h3>
       <ul>
-        <li>זוכרים?</li>
-        <li>הניחוש לפני הבדיקה</li>
-        <li>קופסת הסקווישים</li>
-        <li>"דבר אחד שלמדתי היום"</li>
+        <li>הקופסה (5 דקות)</li>
+        <li>הניחוש והבדיקה בנושא הראשי</li>
+        <li>שאלת הסיום</li>
+        <li>בכל מפגש כתוב גם "זה מספיק להיום"</li>
       </ul>
     </div>
   </div>
@@ -377,7 +356,7 @@ p + p { margin-top: 2mm; }
     <dd>כן, ככה זה אמור להיות. המטרה של הניחוש היא לא לצדוק אלא להתחייב לתשובה. טעויות שמתגלות ומפתיעות הן מהדברים שנזכרים הכי טוב.</dd>
 
     <dt>היא אומרת "משעמם, אני כבר יודעת".</dt>
-    <dd>מעולה. עונים מהר, והכרטיס מתקדם תא. ככה הוא יחזור רק בעוד שבוע, ואחר כך בעוד שבועיים. זה בדיוק מה שהקופסה עושה.</dd>
+    <dd>מעולה. עונים מהר, והכרטיס חוזר לקופסה. המדריך כבר יודע מתי להוציא אותו שוב, בעוד כמה מפגשים. זה בדיוק מה שהקופסה עושה.</dd>
 
     <dt>אני לא בטוחה איך מבטאים מילה באנגלית.</dt>
     <dd>לכל מילה ולכל צליל יש קישור או QR עם הקלטה. מקשיבות ביחד וחוזרות אחריה. ליד כל צליל יש גם הסבר בעברית איך מבטאים. כשהיא רואה שגם את לומדת, זה דווקא עוזר.</dd>
@@ -386,7 +365,7 @@ p + p { margin-top: 2mm; }
     <dd>בשבועות הראשונים זה עשוי להרגיש איטי, כי חלק גדול מהזמן הולך לחזרה. כדאי לשמור את דפי הכתיבה: ההבדל נראה הכי טוב כשמניחים דף משבוע 1 ליד דף משבוע 6.</dd>
 
     <dt>משהו לא עבד או היה קשה מדי.</dt>
-    <dd>לסמן בדף המעקב השבועי ולכתוב מילה אחת למה. ככה אפשר להתאים את השבוע הבא אליה.</dd>
+    <dd>לכתוב את זה בדף המעקב, בשאלה "איפה היא צריכה עזרה?". שלוש שאלות קצרות בסוף השבוע, ולפיהן מתאימים את השבוע הבא.</dd>
   </dl>
 
   <div class="foot"><span>LevCatom · תוכנית חינוך ביתי</span><span>3 / 3</span></div>
