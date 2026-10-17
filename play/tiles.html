@@ -6,8 +6,8 @@
 <title>אריחי צלילים</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/site.css?v=5">
-<script src="../js/common.js?v=5"></script>
+<link rel="stylesheet" href="../css/site.css?v=7">
+<script src="../js/common.js?v=7"></script>
 <script>loadWeek('../');</script>
 <style>
   .tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
@@ -105,7 +105,7 @@ function check(w) {
     $('check').outerHTML = `<button class="btn" id="next">${i < Wk.words.length - 1 ? 'המילה הבאה ←' : '🎉 סיימנו! עוד סיבוב'}</button>`;
     $('next').onclick = () => { i = (i + 1) % Wk.words.length; progress(); render(); };
   } else {
-    $('msg').textContent = 'כמעט! בואי נבדוק את הצלילים האדומים. אומרים כל צליל לאט.';
+    $('msg').textContent = 'בואי נבדוק יחד את הצלילים המסומנים. אומרים כל צליל לאט, ומקשיבים שוב 🔊';
     $('slots').classList.remove('shake'); void $('slots').offsetWidth; $('slots').classList.add('shake');
   }
 }

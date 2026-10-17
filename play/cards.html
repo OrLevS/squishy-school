@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קופסת הסקווישים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css?v=7">
+<script src="../js/config.js?v=7"></script>
+<script src="../js/common.js?v=7"></script>
+<script src="../js/track.js?v=7"></script>
+<script>loadWeek('../');</script>
+<style>
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tabs button { font: inherit; border: 2px solid var(--beige); background: #fff; border-radius: 99px; padding: 6px 18px; cursor: pointer; }
+  .tabs button[aria-pressed=true] { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .cardq { background: #fff; border-radius: 26px; padding: 28px; text-align: center; font-size: 26px; box-shadow: 0 2px 0 var(--beige); }
+  .bigen { font-family: var(--en); font-size: 54px; direction: ltr; }
+  .ans { margin-top: 14px; font-size: 24px; color: var(--teal); white-space: pre-line; font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .mini { background: #fff; border-radius: 20px; padding: 14px 16px; font-size: 17px; border: 2px solid transparent; }
+  .mini.ny { border-color: var(--sand); }
+  .mini .kind { font-size: 13px; color: var(--brown); }
+  .mini .q { font-weight: 500; margin: 4px 0; }
+  .mini .a { color: var(--teal); white-space: pre-line; }
+  .meta { color: var(--brown); text-align: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="top"><a class="back" id="back" href="../w1/">→ לשבוע</a><span class="crumb">חזרה</span></div>
+<main class="wrap">
+  <h1>🫧 קופסת הסקווישים</h1>
+  <p class="lead">כל הכרטיסים שכבר למדנו. אפשר לחזור עליהם מתי שרוצים, גם בלי מפגש שלם.</p>
+  <div class="tabs" role="group">
+    <button aria-pressed="true" data-m="quick">⚡ חזרה מהירה</button>
+    <button aria-pressed="false" data-m="all">📚 כל הכרטיסים</button>
+  </div>
+  <div id="out"></div>
+  <p class="meta"><label><input type="checkbox" id="every"> להציג גם כרטיסים ממפגשים שעוד לא עשינו</label></p>
+</main>
+<script>
+const Wk = WEEKS[weekNo()];
+document.getElementById('back').href = `../w${Wk.n}/`;
+const $ = id => document.getElementById(id);
+const store = window.trackStore;
+const BOX = 'sq-box-w' + Wk.n;
+let mode = 'quick';
+
+// כרטיס נכנס למאגר בסוף המפגש שבו נלמד
+function available() {
+  const done = store.get('sq-done-w' + Wk.n, []);
+  return Wk.cards.filter(c => $('every').checked || done.includes(c.s));
+}
+const fmt = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
+  .replace(/[A-Za-z][A-Za-z _]*[A-Za-z_.?]/g, m => `<bdi class="en">${m}</bdi>`);
+
+function quick() {
+  const box = store.get(BOX, { notYet: [] });
+  const pool = available();
+  if (!pool.length) {
+    $('out').innerHTML = `<div class="cardq">עוד אין כרטיסים במאגר.<br>הם נכנסים בסוף כל מפגש. מתחילים ממפגש 1!</div>`;
+    return;
+  }
+  // קודם מה שב"עוד לא", ואז השאר בסדר אקראי. עד 10 כרטיסים בסבב.
+  const ny = pool.filter(c => box.notYet.includes(c.n));
+  const rest = pool.filter(c => !box.notYet.includes(c.n)).sort(() => Math.random() - .5);
+  const round = [...ny, ...rest].slice(0, 10);
+  let k = 0, knew = 0;
+  const show = () => {
+    if (k >= round.length) {
+      $('out').innerHTML = `<div class="cardq">${squishySVG('#E9C46A', 90)}<div style="margin-top:10px">סיימנו סבב! ידעת ${knew} מתוך ${round.length}. 🎉</div>
+        <div class="btn-row"><button class="btn teal" id="again">🔁 עוד סבב</button></div></div>`;
+      $('again').onclick = quick;
+      return;
+    }
+    const c = round[k];
+    $('out').innerHTML = `<div class="cardq">
+      ${c.big ? `<div class="bigen">${c.big} <button class="speak" id="hear">🔊</button></div>` : ''}
+      <div>${fmt(c.q)}</div>
+      <div class="btn-row"><button class="btn teal" id="flip">👀 בודקים</button></div>
+      <div class="ans" id="ans" hidden>${fmt(c.a)}</div>
+      <div class="btn-row" id="judge" hidden><button class="btn teal" data-k="1">✓ ידעתי</button><button class="btn alt" data-k="0">⏳ עוד לא</button></div>
+      <div class="meta">כרטיס ${k + 1} מתוך ${round.length}</div></div>`;
+    if ($('hear')) $('hear').onclick = () => say(c.big);
+    $('flip').onclick = () => { $('ans').hidden = false; $('judge').hidden = false; $('flip').hidden = true; };
+    document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+      const ok = b.dataset.k === '1';
+      const bx = store.get(BOX, { notYet: [] });
+      bx.notYet = bx.notYet.filter(n => n !== c.n);
+      if (!ok) bx.notYet.push(c.n);
+      store.set(BOX, bx);
+      track(Wk.n, 0, k, 'card', { n: c.n, knew: ok, free: true });
+      if (ok) knew++;
+      k++; show();
+    });
+  };
+  show();
+}
+function all() {
+  const box = store.get(BOX, { notYet: [] });
+  const pool = available();
+  $('out').innerHTML = pool.length ? `<div class="grid">${pool.map(c => `
+    <div class="mini ${box.notYet.includes(c.n) ? 'ny' : ''}"><div class="kind">${c.kind} · מפגש ${c.s}${box.notYet.includes(c.n) ? ' · ⏳ עוד לא' : ''}</div>
+      ${c.big ? `<div class="bigen" style="font-size:32px">${c.big}</div>` : ''}
+      <div class="q">${fmt(c.q)}</div><div class="a">${fmt(c.a)}</div></div>`).join('')}</div>`
+    : `<div class="cardq">עוד אין כרטיסים במאגר. הם נכנסים בסוף כל מפגש.</div>`;
+}
+function render() { mode === 'quick' ? quick() : all(); }
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  mode = b.dataset.m; render();
+});
+$('every').onchange = render;
+render();
+</script>
+</body>
+</html>

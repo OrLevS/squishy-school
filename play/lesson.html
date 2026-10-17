@@ -6,11 +6,11 @@
 <title>מפגש עם סקווישי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/site.css?v=5">
-<script src="../js/config.js?v=5"></script>
-<script src="../js/common.js?v=5"></script>
-<script src="../js/track.js?v=5"></script>
-<script src="../js/kidpages.js?v=5"></script>
+<link rel="stylesheet" href="../css/site.css?v=7">
+<script src="../js/config.js?v=7"></script>
+<script src="../js/common.js?v=7"></script>
+<script src="../js/track.js?v=7"></script>
+<script src="../js/kidpages.js?v=7"></script>
 <script>loadWeek('../');</script>
 <style>
   body { padding-bottom: 110px; transition: background-color .4s ease; }
@@ -127,10 +127,11 @@ const R = {
       `<button class="opt ${guesses[st.id] === k ? 'chosen' : ''}" data-g="${k}">${o}</button>`).join('')}</div>`,
   activity: st => speaker(st.he) + `<iframe class="act" src="../${linkOf(st.link).path}&embed=1" title="${linkOf(st.link).title}"></iframe>`,
   reveal: st => {
-    const g = Wk.sessions.flatMap(s => s.kid || []).find(x => x.id === st.guess);
-    const right = guesses[st.guess] === g.right;
-    return `<div class="reveal"><h2>${right ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>${fmt(st.he)}
-      ${right ? '' : '\n\nהניחוש שלך לא התאים, וזה בדיוק מה שעוזר לזכור. 💪'}</div>`;
+    // לא אומרים "צדקת" או "טעית": מראים מה גילינו, והיא משווה בעצמה לניחוש שלה
+    return `<div class="reveal"><h2>🔍 מה גילינו?</h2>${fmt(st.he)}</div>
+      <div class="cardq" style="margin-top:16px"><div>🤔 האם זה היה הניחוש שלך?</div>
+      <div class="btn-row"><button class="btn teal" data-same="1">כן, זה מה שניחשתי</button><button class="btn alt" data-same="0">ניחשתי משהו אחר</button></div>
+      <div id="sameans" style="font-size:22px;color:var(--brown)"></div></div>`;
   },
   mom: st => `<div class="mom"><small>👩 ${st.label || 'שאלה לשיחה עם אמא'}</small>${fmt(st.q)}</div>`,
   words: st => speaker(st.he) + `<div class="opts">${st.words.map(x => `<div class="cardq"><div class="bigen">${x.w} <button class="speak" onclick="say('${x.w}')">🔊</button></div><div style="font-size:20px">${fmt(x.he)}</div></div>`).join('')}</div>`,
@@ -213,6 +214,12 @@ const WIRE = {
     };
     draw();
   },
+  reveal: st => document.querySelectorAll('[data-same]').forEach(b => b.onclick = () => {
+    const same = b.dataset.same === '1';
+    $('sameans').textContent = same ? 'יפה! ספרי לאמא: איך ידעת?' : 'מעניין! מה ניחשת, ולמה? ספרי לאמא. ככה המוח לומד.';
+    const g = Wk.sessions.flatMap(s => s.kid || []).find(x => x.id === st.guess);
+    T('self-check', { id: st.guess, said_same: same, was_same: guesses[st.guess] === g.right });
+  }),
   hunt: st => {
     let r = 0;
     const set = () => { $('hrow').textContent = `שורה ${r + 1} מתוך ${st.targets.length}`; $('hsay').textContent = `מקיפים את הצליל: ${SOUND_SAY[st.targets[r]]}`; $('hnext').textContent = r < st.targets.length - 1 ? 'השורה הבאה' : '✓ סיימנו את הציד'; };
@@ -270,6 +277,9 @@ function go(d) {
     // אם אמא כתבה ולא לחצה "שליחה", שולחים בכל זאת
     if ($('good') && !$('sent').textContent && ($('good').value.trim() || $('less').value.trim()))
       T('mom-note', { good: $('good').value.trim(), less: $('less').value.trim() });
+    // המפגש הסתיים: הכרטיסים שלו נכנסים למאגר החזרה
+    const doneList = store.get('sq-done-w' + Wk.n, []);
+    if (!doneList.includes(S.n)) { doneList.push(S.n); store.set('sq-done-w' + Wk.n, doneList); }
     T('session-done', null);
     $('stage').innerHTML = speaker('כל הכבוד! 🎉\nנתראה במפגש הבא.') + `<div class="btn-row"><a class="btn" href="../w${Wk.n}/">חזרה לשבוע</a></div>`;
     $('next').hidden = true; $('back').hidden = true;

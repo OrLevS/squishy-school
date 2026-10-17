@@ -10,7 +10,7 @@ window.weekNo = function () {
 // נקרא מתוך <script> בראש הדף, כדי שנתוני השבוע ייטענו לפני הקוד של הדף
 window.loadWeek = function (prefix) {
   const n = String(window.weekNo()).padStart(2, '0');
-  document.write(`<script src="${prefix}data/week-${n}.js?v=5"><\/script>`);
+  document.write(`<script src="${prefix}data/week-${n}.js?v=7"><\/script>`);
 };
 
 // ---------- הקראה ----------
