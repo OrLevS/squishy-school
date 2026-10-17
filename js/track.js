@@ -31,7 +31,9 @@
   }
   window.track = function (week, session, step, kind, value) {
     const q = store.get(KEY, []);
-    q.push({ device, week, session, step, kind, value: value ?? null, at: new Date().toISOString() });
+    const pr = window.Profile && Profile.current();
+    q.push({ device, student: pr ? Profile.label(pr) : null, profile: pr ? pr.id : null,
+      week, session, step, kind, value: value ?? null, at: new Date().toISOString() });
     store.set(KEY, q);
     flush();
   };

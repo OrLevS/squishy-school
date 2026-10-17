@@ -6,11 +6,12 @@
 <title>מפגש עם סקווישי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/site.css?v=7">
-<script src="../js/config.js?v=7"></script>
-<script src="../js/common.js?v=7"></script>
-<script src="../js/track.js?v=7"></script>
-<script src="../js/kidpages.js?v=7"></script>
+<link rel="stylesheet" href="../css/site.css?v=8">
+<script src="../js/config.js?v=8"></script>
+<script src="../js/common.js?v=8"></script>
+<script src="../js/profile.js?v=8"></script>
+<script src="../js/track.js?v=8"></script>
+<script src="../js/kidpages.js?v=8"></script>
 <script>loadWeek('../');</script>
 <style>
   body { padding-bottom: 110px; transition: background-color .4s ease; }
@@ -68,6 +69,7 @@
 </div></div>
 
 <script>
+if (!Profile.current()) requireProfile(() => location.reload()); else (function () {
 const params = new URLSearchParams(location.search);
 const Wk = WEEKS[weekNo()], S = Wk.sessions[(+params.get('s') || 1) - 1];
 const KID = kidPages(Wk), kidOf = id => KID.find(k => k.id === id);
@@ -80,14 +82,15 @@ const T = (kind, value) => track(Wk.n, S.n, i, kind, value);
 const SOUND_SAY = { s: 'סססס', a: 'אַ', t: 'ט', m: 'ממממ', p: 'פּ', i: 'אִ', n: 'ננננ' };
 
 // קופסת הכרטיסים הדיגיטלית: הכרטיסים של היום לפי המדריך + מה שנשאר ב"עוד לא"
-const BOX = 'sq-box-w' + Wk.n;
+const BOX = Profile.key('sq-box-w' + Wk.n);
 const box = store.get(BOX, { notYet: [] });
 // עד 8 כרטיסים במפגש: קודם אלה שהמדריך קבע להיום, ואז מה שחיכה ב"עוד לא"
 const dueNums = [...new Set([...S.cards, ...box.notYet])].slice(0, 8);
 const steps = [];
 if (dueNums.length) steps.push({ t: 'cards-intro' }, ...dueNums.map(n => ({ t: 'card', n })));
 steps.push(...S.kid, { t: 'mom-note' });
-const guesses = store.get('sq-guess-w' + Wk.n, {});
+const GUESS = Profile.key('sq-guess-w' + Wk.n);
+const guesses = store.get(GUESS, {});
 let i = 0, done = new Set();
 
 $('ttl').textContent = `מפגש ${S.n}: ${S.title}`;
@@ -169,7 +172,7 @@ const WIRE = {
     });
   },
   guess: st => document.querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
-    guesses[st.id] = +b.dataset.g; store.set('sq-guess-w' + Wk.n, guesses);
+    guesses[st.id] = +b.dataset.g; store.set(GUESS, guesses);
     document.querySelectorAll('[data-g]').forEach(x => x.classList.toggle('chosen', x === b));
     bounce(document.querySelector('.speaker svg'));
     T('guess', { id: st.id, pick: +b.dataset.g, right: +b.dataset.g === st.right });
@@ -278,8 +281,9 @@ function go(d) {
     if ($('good') && !$('sent').textContent && ($('good').value.trim() || $('less').value.trim()))
       T('mom-note', { good: $('good').value.trim(), less: $('less').value.trim() });
     // המפגש הסתיים: הכרטיסים שלו נכנסים למאגר החזרה
-    const doneList = store.get('sq-done-w' + Wk.n, []);
-    if (!doneList.includes(S.n)) { doneList.push(S.n); store.set('sq-done-w' + Wk.n, doneList); }
+    const DONE = Profile.key('sq-done-w' + Wk.n);
+    const doneList = store.get(DONE, []);
+    if (!doneList.includes(S.n)) { doneList.push(S.n); store.set(DONE, doneList); }
     T('session-done', null);
     $('stage').innerHTML = speaker('כל הכבוד! 🎉\nנתראה במפגש הבא.') + `<div class="btn-row"><a class="btn" href="../w${Wk.n}/">חזרה לשבוע</a></div>`;
     $('next').hidden = true; $('back').hidden = true;
@@ -292,6 +296,8 @@ $('next').onclick = () => go(1);
 $('back').onclick = () => go(-1);
 T('session-start', null);
 show();
+window.L = { get steps() { return steps; }, get i() { return i; } }; // לבדיקות
+})();
 </script>
 </body>
 </html>

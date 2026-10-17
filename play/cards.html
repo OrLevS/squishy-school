@@ -6,10 +6,11 @@
 <title>קופסת הסקווישים</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/site.css?v=7">
-<script src="../js/config.js?v=7"></script>
-<script src="../js/common.js?v=7"></script>
-<script src="../js/track.js?v=7"></script>
+<link rel="stylesheet" href="../css/site.css?v=8">
+<script src="../js/config.js?v=8"></script>
+<script src="../js/common.js?v=8"></script>
+<script src="../js/profile.js?v=8"></script>
+<script src="../js/track.js?v=8"></script>
 <script>loadWeek('../');</script>
 <style>
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -44,12 +45,12 @@ const Wk = WEEKS[weekNo()];
 document.getElementById('back').href = `../w${Wk.n}/`;
 const $ = id => document.getElementById(id);
 const store = window.trackStore;
-const BOX = 'sq-box-w' + Wk.n;
+const BOX = Profile.key('sq-box-w' + Wk.n);
 let mode = 'quick';
 
 // כרטיס נכנס למאגר בסוף המפגש שבו נלמד
 function available() {
-  const done = store.get('sq-done-w' + Wk.n, []);
+  const done = store.get(Profile.key('sq-done-w' + Wk.n), []);
   return Wk.cards.filter(c => $('every').checked || done.includes(c.s));
 }
 const fmt = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
@@ -112,7 +113,7 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   mode = b.dataset.m; render();
 });
 $('every').onchange = render;
-render();
+if (Profile.current()) render(); else requireProfile(() => location.reload());
 </script>
 </body>
 </html>

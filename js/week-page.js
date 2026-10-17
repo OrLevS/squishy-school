@@ -1,6 +1,6 @@
 // דף השבוע: רק המפגשים בנגן, ודפים להדפסה.
 // (הפעילויות נפתחות מתוך המפגשים עצמם, וקישורי ה־QR בחוברת עדיין עובדים.)
-(function () {
+function weekPage() {
   const n = parseInt(location.pathname.match(/w(\d+)\/?/)[1], 10);
   const Wk = WEEKS[n];
   document.getElementById('out').innerHTML = `
@@ -19,4 +19,6 @@
     <div class="links">
       <a class="link" href="../pdf/w${Wk.n}-kid.pdf"><span class="ic">🖨</span><span><b>הדפים של השבוע</b><small>PDF בשחור־לבן. מדפיסים פעם אחת לפני מפגש 1.</small></span></a>
     </div>`;
-})();
+  profileBadge(document.getElementById('badge'));
+}
+requireProfile(weekPage);
