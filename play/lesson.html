@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מפגש עם סקווישי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<script src="../js/config.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/track.js"></script>
+<script src="../js/kidpages.js"></script>
+<script>loadWeek('../');</script>
+<style>
+  body { padding-bottom: 110px; transition: background-color .4s ease; }
+  body.paper { background: #e9e1d5; }
+  .bar { max-width: 900px; margin: 0 auto; padding: 14px 0 6px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .bar .ttl { font-family: "Pogo", Rubik; font-size: 20px; color: var(--coral); }
+  .dots { display: flex; gap: 6px; flex-wrap: wrap; margin-inline-start: auto; }
+  .dots span { width: 12px; height: 12px; border-radius: 50%; background: var(--beige); }
+  .dots span.done { background: var(--teal); }
+  .dots span.now { background: var(--coral); transform: scale(1.3); }
+  .stage { max-width: 900px; margin: 10px auto 0; }
+  .speaker { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+  .speaker .squishy { flex: none; }
+  .bubble { background: #fff; border-radius: 26px 26px 26px 8px; padding: 18px 22px; font-size: 24px; line-height: 1.5; white-space: pre-line; box-shadow: 0 2px 0 var(--beige); flex: 1; }
+  .bubble .note { display: block; font-size: 17px; color: var(--brown); margin-top: 8px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .opt { font: inherit; font-size: 24px; border: 3px solid var(--beige); background: #fff; border-radius: 22px; padding: 18px; cursor: pointer; }
+  .opt.chosen { border-color: var(--coral); background: #fdeee9; }
+  .paperbox { display: flex; gap: 22px; align-items: center; background: #fff; border-radius: 26px; padding: 18px; }
+  .paperbox img { width: 190px; border: 2px solid #1d1d1d; border-radius: 6px; flex: none; background: #fff; }
+  .paperbox .big { font-family: "Pogo", Rubik; font-size: 34px; color: var(--navy); }
+  @media (max-width: 600px) { .paperbox { flex-direction: column; } .paperbox img { width: 70%; } .bubble { font-size: 20px; } }
+  iframe.act { width: 100%; height: 640px; border: 0; border-radius: 26px; background: #fff; }
+  .reveal { background: var(--teal); color: #fff; border-radius: 26px; padding: 22px; font-size: 24px; white-space: pre-line; line-height: 1.5; }
+  .reveal h2 { color: var(--gold); margin-bottom: 6px; }
+  .mom { background: var(--navy); color: var(--cream); border-radius: 26px; padding: 26px; font-size: 26px; line-height: 1.5; }
+  .mom small { display: block; color: var(--gold); font-size: 18px; margin-bottom: 6px; }
+  .tiles { display: flex; gap: 14px; justify-content: center; direction: ltr; flex-wrap: wrap; }
+  .tile { width: 110px; height: 130px; border-radius: 22px; border: 0; background: var(--gold); box-shadow: 0 6px 0 #c9a443; font-family: var(--en); font-size: 70px; color: var(--navy); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+  .tile small { font-family: var(--he); font-size: 24px; height: 28px; margin-top: 6px; }
+  .tile:active { transform: translateY(4px); box-shadow: 0 2px 0 #c9a443; }
+  .blend { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .blend .word { display: flex; gap: 10px; direction: ltr; font-family: var(--en); font-size: 84px; }
+  .blend .word span { color: #c8bfb2; transition: color .2s; }
+  .blend .word span.on { color: var(--navy); }
+  .blend .heb { font-size: 30px; min-height: 44px; color: var(--coral); font-weight: 500; }
+  .timer { font-family: "Pogo", Rubik; font-size: 72px; text-align: center; color: var(--teal); }
+  .cardq { background: #fff; border-radius: 26px; padding: 26px; text-align: center; font-size: 26px; }
+  .cardq .bigen { font-family: var(--en); font-size: 54px; direction: ltr; }
+  .cardq .ans { margin-top: 14px; font-size: 24px; color: var(--teal); white-space: pre-line; font-weight: 500; }
+  .nav { position: fixed; bottom: 0; inset-inline: 0; background: var(--cream); border-top: 2px solid var(--beige); padding: 12px 16px; }
+  .nav .in { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .nav .btn { font-size: 22px; padding: 12px 30px; }
+  .mood { display: flex; gap: 14px; justify-content: center; }
+  .mood button { font-size: 54px; background: #fff; border: 3px solid var(--beige); border-radius: 50%; width: 92px; height: 92px; cursor: pointer; }
+  .mood button.chosen { border-color: var(--coral); }
+</style>
+</head>
+<body>
+<div class="bar"><span class="ttl" id="ttl"></span><div class="dots" id="dots"></div></div>
+<main class="stage" id="stage"></main>
+<div class="nav"><div class="in">
+  <button class="btn alt" id="back">→ אחורה</button>
+  <button class="btn" id="next">הבא ←</button>
+</div></div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const Wk = WEEKS[weekNo()], S = Wk.sessions[(+params.get('s') || 1) - 1];
+const KID = kidPages(Wk), kidOf = id => KID.find(k => k.id === id);
+const linkOf = id => Wk.links.find(l => l.id === id);
+const $ = id => document.getElementById(id);
+const store = window.trackStore;
+const T = (kind, value) => track(Wk.n, S.n, i, kind, value);
+
+// הצליל בעברית, כמו שאומרים אותו בקול
+const SOUND_SAY = { s: 'סססס', a: 'אַ', t: 'ט', m: 'ממממ', p: 'פּ', i: 'אִ', n: 'ננננ' };
+
+// קופסת הכרטיסים הדיגיטלית: הכרטיסים של היום לפי המדריך + מה שנשאר ב"עוד לא"
+const BOX = 'sq-box-w' + Wk.n;
+const box = store.get(BOX, { notYet: [] });
+const dueNums = [...new Set([...S.cards, ...box.notYet])];
+const steps = [];
+if (dueNums.length) steps.push({ t: 'cards-intro' }, ...dueNums.map(n => ({ t: 'card', n })));
+steps.push(...S.kid);
+const guesses = store.get('sq-guess-w' + Wk.n, {});
+let i = 0, done = new Set();
+
+$('ttl').textContent = `מפגש ${S.n}: ${S.title}`;
+document.title = `מפגש ${S.n} · ${S.title}`;
+
+function speaker(text, mood, note) {
+  return `<div class="speaker">${squishySVG('#2A9D8F', 84, mood)}<div class="bubble">${fmt(text)}${note ? `<span class="note">${fmt(note)}</span>` : ''}</div></div>`;
+}
+// מילים באנגלית בתוך הטקסט מקבלות כפתור קול
+function fmt(text) {
+  const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  return esc(text).replace(/[A-Za-z][A-Za-z ]*[A-Za-z]/g, m => `<bdi class="en">${m}</bdi>`);
+}
+function dots() {
+  $('dots').innerHTML = steps.map((_, k) => `<span class="${k < i ? 'done' : k === i ? 'now' : ''}"></span>`).join('');
+}
+
+const R = {
+  hello: st => speaker(st.he),
+  'cards-intro': () => speaker(`קודם כרטיסי הזיכרון!\nאני שואל, את עונה בלי להציץ.\nהיום יש ${dueNums.length} כרטיסים.`),
+  card: st => {
+    const c = Wk.cards.find(c => c.n === st.n);
+    return `<div class="cardq">${c.big ? `<div class="bigen">${c.big} <button class="speak" onclick="say('${c.big}')">🔊</button></div>` : ''}
+      <div>${fmt(c.q)}</div>
+      <div class="btn-row"><button class="btn teal" id="flip">👀 בודקים</button></div>
+      <div class="ans" id="ans" hidden>${fmt(c.a)}</div>
+      <div class="btn-row" id="judge" hidden><button class="btn teal" data-k="1">✓ ידעתי</button><button class="btn alt" data-k="0">⏳ עוד לא</button></div></div>`;
+  },
+  paper: st => {
+    const k = kidOf(st.page);
+    document.body.classList.add('paper');
+    return speaker(st.he) + `<div class="paperbox"><img src="../assets/pages/w${Wk.n}-p${k.no}.png" alt="דף ${k.no}">
+      <div><div class="big">📄 עכשיו בדף ${k.no}</div><div style="font-size:20px">${k.title}${st.task ? ` · משימה ${st.task}` : ''}</div>
+      <p style="margin-top:12px;color:var(--brown)">המסך מחכה. כשמסיימות, לוחצות "הבא".</p></div></div>`;
+  },
+  guess: st => speaker(st.he, 'wow', st.note) + `<div class="opts">${st.opts.map((o, k) =>
+      `<button class="opt ${guesses[st.id] === k ? 'chosen' : ''}" data-g="${k}">${o}</button>`).join('')}</div>`,
+  activity: st => speaker(st.he) + `<iframe class="act" src="../${linkOf(st.link).path}&embed=1" title="${linkOf(st.link).title}"></iframe>`,
+  reveal: st => {
+    const g = Wk.sessions.flatMap(s => s.kid || []).find(x => x.id === st.guess);
+    const right = guesses[st.guess] === g.right;
+    return `<div class="reveal"><h2>${right ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>${fmt(st.he)}
+      ${right ? '' : '\n\nהניחוש שלך לא התאים, וזה בדיוק מה שעוזר לזכור. 💪'}</div>`;
+  },
+  mom: st => `<div class="mom"><small>👩 שאלה לשיחה עם אמא</small>${fmt(st.q)}</div>`,
+  break: st => speaker(st.he) + `<div class="timer" id="tm">${st.min}:00</div><div class="btn-row"><button class="btn teal" id="go">▶ מתחילים</button></div>`,
+  sounds: st => speaker(st.he) + `<div class="tiles">${st.letters.map(l => `<button class="tile" data-l="${l}">${l}<small></small></button>`).join('')}</div>`,
+  blend: st => speaker(st.he) + `<div class="blend" id="bl"></div>`,
+  end: st => speaker(st.he) + `<p style="text-align:center;font-size:20px;margin-bottom:10px">איך היה היום?</p>
+    <div class="mood">${['😊', '😐', '😓'].map(m => `<button data-m="${m}">${m}</button>`).join('')}</div>
+    ${(() => { const n = Wk.cards.filter(c => c.s === S.n).length; return n ? `<p class="hint" style="margin-top:18px;text-align:center">🫧 ${n} כרטיסי זיכרון חדשים נכנסו לקופסה שלך. נפגוש אותם במפגש הבא!</p>` : ''; })()}`
+};
+
+const WIRE = {
+  card: st => {
+    $('flip').onclick = () => { $('ans').hidden = false; $('judge').hidden = false; $('flip').hidden = true; };
+    document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+      const knew = b.dataset.k === '1';
+      box.notYet = box.notYet.filter(n => n !== st.n);
+      if (!knew) box.notYet.push(st.n);
+      store.set(BOX, box); T('card', { n: st.n, knew });
+      go(1);
+    });
+  },
+  guess: st => document.querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
+    guesses[st.id] = +b.dataset.g; store.set('sq-guess-w' + Wk.n, guesses);
+    document.querySelectorAll('[data-g]').forEach(x => x.classList.toggle('chosen', x === b));
+    bounce(document.querySelector('.speaker svg'));
+    T('guess', { id: st.id, pick: +b.dataset.g, right: +b.dataset.g === st.right });
+  }),
+  break: st => {
+    $('go').onclick = () => {
+      $('go').hidden = true; let left = st.min * 60;
+      const t = setInterval(() => {
+        left--; $('tm').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+        if (left <= 0 || !$('tm')) { clearInterval(t); if ($('tm')) $('tm').textContent = '🎉'; }
+      }, 1000);
+    };
+  },
+  sounds: () => document.querySelectorAll('.tile').forEach(b => b.onclick = () => {
+    b.querySelector('small').textContent = SOUND_SAY[b.dataset.l] || '';
+  }),
+  blend: st => {
+    let w = 0;
+    const draw = () => {
+      const word = st.words[w]; let k = 0;
+      $('bl').innerHTML = `<div class="word">${[...word].map(c => `<span>${c}</span>`).join('')}</div>
+        <div class="heb" id="hb">לוחצים על הסקוויש</div>
+        <button id="sqz" style="border:0;background:none;cursor:pointer">${squishySVG('#E9C46A', 120)}</button>
+        <div class="btn-row" id="more" hidden></div>`;
+      $('sqz').onclick = () => {
+        const spans = $('bl').querySelectorAll('.word span');
+        bounce($('sqz').firstElementChild);
+        if (k < word.length) {
+          spans[k].classList.add('on');
+          $('hb').textContent = [...word].slice(0, k + 1).map(c => SOUND_SAY[c] || c).join(' · ');
+          k++;
+          if (k === word.length) {
+            $('hb').innerHTML = `ועכשיו כל המילה: <bdi class="en">${word}</bdi>`;
+            say(word);
+            $('more').hidden = false;
+            $('more').innerHTML = `<button class="speak" onclick="say('${word}')">🔊</button>` +
+              (w < st.words.length - 1 ? `<button class="btn teal" id="nw">המילה הבאה</button>` : '');
+            if ($('nw')) $('nw').onclick = () => { w++; draw(); };
+          }
+        }
+      };
+    };
+    draw();
+  },
+  end: () => document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('chosen', x === b));
+    T('mood', b.dataset.m);
+  })
+};
+
+function show() {
+  document.body.classList.remove('paper');
+  const st = steps[i];
+  $('stage').innerHTML = R[st.t](st);
+  if (WIRE[st.t]) WIRE[st.t](st);
+  dots();
+  $('back').style.visibility = i ? 'visible' : 'hidden';
+  $('next').textContent = i === steps.length - 1 ? '✓ סיימנו' : 'הבא ←';
+  $('next').hidden = st.t === 'card';
+  window.scrollTo(0, 0);
+  T('view', st.t);
+}
+function go(d) {
+  if (d > 0 && steps[i].t === 'guess' && guesses[steps[i].id] == null) {
+    bounce(document.querySelector('.speaker svg'));
+    document.querySelector('.bubble').insertAdjacentHTML('beforeend', '<span class="note">קודם בוחרים ניחוש 🙂 אין פה תשובה לא נכונה.</span>');
+    return;
+  }
+  if (d > 0 && i === steps.length - 1) {
+    T('session-done', null);
+    $('stage').innerHTML = speaker('כל הכבוד! 🎉\nנתראה במפגש הבא.') + `<div class="btn-row"><a class="btn" href="../w${Wk.n}/">חזרה לשבוע</a></div>`;
+    $('next').hidden = true; $('back').hidden = true;
+    return;
+  }
+  i = Math.max(0, Math.min(steps.length - 1, i + d));
+  show();
+}
+$('next').onclick = () => go(1);
+$('back').onclick = () => go(-1);
+T('session-start', null);
+show();
+</script>
+</body>
+</html>

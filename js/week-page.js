@@ -13,6 +13,9 @@
     </div>
     <p class="lead">משפט השבוע: <span class="en" style="font-size:26px">${Wk.sentence}</span>
       <button class="speak" style="vertical-align:middle;width:44px;height:44px;font-size:20px" onclick="say('${Wk.sentence}')" aria-label="שומעים">🔊</button></p>
+    ${Wk.sessions.some(x => x.kid) ? `<h2 style="margin:22px 0 10px">▶ מתחילים מפגש עם סקווישי</h2>
+      <div class="links">${Wk.sessions.filter(x => x.kid).map(x => `<a class="link" href="../play/lesson.html?w=${Wk.n}&s=${x.n}" style="border-color:var(--coral)">
+        <span class="ic">▶</span><span><b>מפגש ${x.n}: ${x.title}</b><small>המסך מוביל, הדפים בצד</small></span></a>`).join('')}</div>` : ''}
     ${bySession.map(g => `<h2 style="margin:22px 0 10px">מפגש ${g.s}</h2><div class="links">${g.links.map(card).join('')}</div>`).join('')}
     <h2 style="margin:22px 0 10px">כל השבוע</h2>
     <div class="links">${Wk.links.filter(l => !l.session).map(card).join('')}</div>

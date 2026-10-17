@@ -202,7 +202,8 @@ function modeToss() {
       <div class="btn-row"><button class="btn teal" id="again">🔁 עוד 20</button></div></div>`);
     $('again').onclick = () => { water = landN = 0; marker = null; render(); play(); };
   }
-  askGuess();
+  // בנגן המפגש הניחוש כבר נעשה במסך הקודם
+  if (window.EMBED) play(); else askGuess();
 }
 
 // =========================================================

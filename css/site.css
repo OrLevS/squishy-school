@@ -88,3 +88,7 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* בתוך נגן המפגש */
+.embed body { padding-top: 10px; }
+.embed .top, .embed main > h1, .embed main > .lead { display: none !important; }

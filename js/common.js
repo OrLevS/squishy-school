@@ -1,5 +1,9 @@
 // משותף לכל דפי האתר: טעינת השבוע, הקראה באנגלית, סקווישי.
 
+// בתוך נגן המפגש (embed=1): בלי כותרות וניווט, רק הפעילות עצמה
+window.EMBED = new URLSearchParams(location.search).get('embed') === '1';
+if (window.EMBED) document.documentElement.classList.add('embed');
+
 window.weekNo = function () {
   return parseInt(new URLSearchParams(location.search).get('w') || '1', 10);
 };
