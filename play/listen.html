@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ההקלטות של השבוע</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<script src="../js/common.js"></script>
+<script>loadWeek('../');</script>
+<style>
+  section { margin-bottom: 26px; }
+  h2 { margin-bottom: 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .row { background: #fff; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .row .w { font-family: var(--en); direction: ltr; font-size: 30px; flex: 1; text-align: left; }
+  .row .he { color: var(--brown); font-size: 15px; }
+  .sound { background: #fff; border-radius: 20px; padding: 12px 16px; display: flex; gap: 14px; align-items: center; }
+  .sound .L { font-family: var(--en); font-size: 44px; width: 50px; text-align: center; }
+  .sound .H { font-size: 30px; font-weight: 700; width: 40px; text-align: center; color: var(--coral); }
+  .sound p { font-size: 15px; flex: 1; }
+</style>
+</head>
+<body>
+<div class="top"><a class="back" id="back" href="../w1/">→ לכל הפעילויות</a><span class="crumb">אנגלית · הקלטות</span></div>
+<main class="wrap">
+  <h1>כל ההקלטות של השבוע</h1>
+  <p class="lead">לוחצים 🔊 ושומעים. 🐢 זה לאט. מקשיבות ביחד וחוזרות בקול.</p>
+  <div id="out"></div>
+</main>
+<script>
+const Wk = WEEKS[weekNo()];
+document.getElementById('back').href = `../w${Wk.n}/`;
+const row = (text, he) => `<div class="row"><span class="w">${text}</span>${he ? `<span class="he">${he}</span>` : ''}
+  <button class="speak" data-t="${text}" aria-label="שומעים">🔊</button><button class="speak slow" data-t="${text}" data-s="1" aria-label="לאט">🐢</button></div>`;
+document.getElementById('out').innerHTML = `
+  <section><h2>✏️ משפט השבוע</h2><div class="grid">${row(Wk.sentence, '')}</div></section>
+  <section><h2>🗣 שאלת השבוע</h2><div class="grid">${row(Wk.talk.q, Wk.talk.qHe)}${Wk.talk.items.map(t => row(t.a, '')).join('')}</div></section>
+  <section><h2>📖 מילים</h2><div class="grid">${Wk.words.map(w => row(w.w, w.he)).join('')}</div></section>
+  <section><h2>♥ מילות לב</h2><div class="grid">${Wk.heart.map(h => row(h.w, h.he)).join('')}</div></section>
+  <section><h2>🔤 הצלילים</h2>
+    <p class="hint" style="margin-bottom:10px">את הצלילים עצמם אומרים בעברית, לפי ההסבר. לא את שם האות.</p>
+    <div class="grid">${Wk.sounds.map(s => `<div class="sound"><span class="L">${s.l}</span><span class="H">${s.he}</span><p>${s.tip}</p></div>`).join('')}</div></section>`;
+document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => say(b.dataset.t, !!b.dataset.s));
+</script>
+</body>
+</html>

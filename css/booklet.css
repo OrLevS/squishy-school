@@ -1,0 +1,237 @@
+/* חוברת שבועית · A4 · מותאמת למדפסת שחור־לבן.
+   הצבע לא נושא משמעות: צורה, מסגרת, אייקון ותווית. */
+
+@font-face { font-family: "Pogo"; src: url("../assets/fonts/SKFPogo-Regular.otf"); }
+
+:root {
+  --ink: #1d1d1d;
+  --soft: #6b6b6b;
+  --line: #9a9a9a;
+  --pale: #efefef;
+  --he: "Rubik", "Arial Hebrew", Arial, sans-serif;
+  --en: "Andika", "Comic Sans MS", sans-serif;
+  --title: "Pogo", "Rubik", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #d9d9d9; }
+body {
+  font-family: var(--he); color: var(--ink);
+  font-size: 13pt; line-height: 1.55;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.en, [lang="en"] { font-family: var(--en); direction: ltr; unicode-bidi: isolate; }
+
+/* ---------- עמודים ---------- */
+@page { size: A4; margin: 12mm 14mm; }
+.page, .flow {
+  width: 182mm; background: #fff; margin: 8mm auto; position: relative;
+  outline: 14mm solid #fff; /* מדמה שוליים על המסך */
+}
+.page { height: 272mm; overflow: hidden; display: flex; flex-direction: column; }
+.flow { padding-bottom: 4mm; }
+@media print {
+  html { background: none; }
+  .page, .flow { margin: 0; outline: none; }
+  .page, .flow { break-before: page; }
+  .page:first-child { break-before: auto; }
+  .toolbar { display: none !important; }
+}
+@media screen { body { padding: 14mm 0 30mm; } }
+
+.toolbar {
+  position: fixed; top: 0; inset-inline: 0; z-index: 9; background: #1d1d1d; color: #fff;
+  display: flex; gap: 12px; align-items: center; justify-content: center; padding: 8px; font-size: 11pt;
+}
+.toolbar button { font: inherit; padding: 4px 14px; border-radius: 99px; border: 0; cursor: pointer; }
+
+/* ---------- כותרות עמוד ---------- */
+.ph { display: flex; align-items: center; gap: 4mm; border-bottom: .6mm solid var(--ink); padding-bottom: 2.5mm; margin-bottom: 4mm; }
+.ph .who { font-size: 9.5pt; border: .4mm solid var(--ink); border-radius: 99px; padding: .5mm 3mm; white-space: nowrap; }
+.ph .who.mom { background: var(--ink); color: #fff; }
+.ph h1 { font-family: var(--title); font-weight: normal; font-size: 21pt; line-height: 1.1; flex: 1; }
+.ph .num { font-family: var(--title); font-size: 15pt; border: .6mm solid var(--ink); border-radius: 50%; width: 11mm; height: 11mm; display: grid; place-items: center; }
+.pf { margin-top: auto; display: flex; justify-content: space-between; font-size: 8.5pt; color: var(--soft); padding-top: 2mm; }
+
+/* פס התקדמות במפגש */
+.progress { display: flex; gap: 1.5mm; margin-bottom: 4mm; font-size: 9pt; }
+.progress span { border: .35mm solid var(--line); border-radius: 99px; padding: .3mm 2.5mm; color: var(--soft); }
+.progress span.on { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+/* ---------- משימה (דפי ילדה) ---------- */
+.task { margin-bottom: 5mm; }
+.task.challenge { border: .5mm dashed var(--ink); border-radius: 4mm; padding: 3mm 4mm; }
+.verb { display: inline-flex; align-items: center; gap: 2mm; margin-bottom: 1.8mm; }
+.verb .n { font-family: var(--title); font-size: 13pt; width: 8mm; height: 8mm; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; }
+.verb .ic { font-size: 14pt; }
+.verb b { font-size: 15pt; }
+.ins { font-size: 12.5pt; }
+.ins + .content, .ins + .ins + .content { margin-top: 3mm; }
+.content { margin-top: 3mm; }
+
+/* בחירה: מקיפים */
+.choices { display: flex; gap: 5mm; flex-wrap: wrap; }
+.choice { border: .5mm solid var(--ink); border-radius: 99px; padding: 2mm 6mm; font-size: 14pt; display: flex; gap: 2mm; align-items: center; }
+.choice .ic { font-size: 16pt; }
+
+/* שורות כתיבה */
+.wl { border-bottom: .35mm solid var(--line); height: 10mm; }
+.starter { font-size: 12.5pt; color: var(--ink); }
+.starter .blank { display: inline-block; min-width: 45mm; border-bottom: .35mm solid var(--line); }
+
+.box { border: .5mm solid var(--ink); border-radius: 4mm; }
+.drawbox { border: .5mm dashed var(--line); border-radius: 5mm; }
+
+/* בנק מילים */
+.bank { display: flex; flex-wrap: wrap; gap: 2.5mm; align-items: center; border: .4mm solid var(--line); border-radius: 3mm; padding: 2mm 3mm; font-size: 12pt; }
+.bank .lbl { font-size: 9.5pt; color: var(--soft); }
+.bank span.w { border: .4mm solid var(--ink); border-radius: 2mm; padding: .5mm 3mm; }
+
+/* ---------- סקווישי (קו מתאר לצביעה) ---------- */
+.sq { display: inline-block; }
+
+/* ---------- מדריך אמא ---------- */
+.mom .prep { border: .5mm solid var(--ink); border-radius: 4mm; padding: 3mm 5mm; margin-bottom: 4mm; font-size: 11.5pt; }
+.mom .prep b { font-family: var(--title); font-weight: normal; font-size: 12.5pt; }
+.mom .prep ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1mm 6mm; margin-top: 1mm; }
+.mom .prep li::before { content: "☐ "; }
+.blk { break-inside: avoid; margin-bottom: 3.5mm; border-inline-start: 1.4mm solid var(--ink); padding-inline-start: 4mm; }
+.blk.light { border-inline-start-style: dotted; }
+.blk h3 { font-family: var(--title); font-weight: normal; font-size: 14pt; display: flex; align-items: center; gap: 2mm; margin-bottom: 1mm; }
+.blk h3 .min { font-family: var(--he); font-size: 9.5pt; border: .35mm solid var(--ink); border-radius: 99px; padding: 0 2mm; }
+.blk h3 .must { font-family: var(--he); font-size: 8.5pt; background: var(--ink); color: #fff; border-radius: 99px; padding: 0 2mm; }
+.st { font-size: 11.5pt; margin: 1mm 0; }
+.st.do::before { content: "•"; margin-inline-end: 2mm; }
+.st.say { background: var(--pale); border-radius: 3mm 3mm 3mm 0; padding: 1.2mm 3.5mm; display: inline-block; font-weight: 500; }
+.st.say::before { content: "💬 "; }
+.st.if { border: .35mm dashed var(--line); border-radius: 2.5mm; padding: 1mm 3mm; font-size: 10.5pt; }
+.st.if b { font-weight: 700; }
+.st.ref { font-size: 10.5pt; display: inline-flex; gap: 1.5mm; align-items: center; border: .35mm solid var(--ink); border-radius: 99px; padding: .2mm 3mm; margin-inline-end: 2mm; }
+.say-wrap { display: block; }
+.golden { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm; margin: 2mm 0 4mm; font-size: 9.5pt; }
+.golden div { border: .35mm solid var(--ink); border-radius: 3mm; padding: 1mm 2.5mm; text-align: center; }
+
+/* ---------- האנגלית של השבוע ---------- */
+table.pron { width: 100%; border-collapse: collapse; font-size: 11pt; }
+table.pron td, table.pron th { border-bottom: .3mm solid var(--line); padding: 1.3mm 2mm; text-align: start; vertical-align: middle; }
+table.pron th { font-size: 9.5pt; color: var(--soft); font-weight: 500; }
+table.pron .L { font-family: var(--en); font-size: 20pt; direction: ltr; width: 18mm; text-align: center; }
+table.pron .H { font-size: 17pt; width: 14mm; text-align: center; font-weight: 700; }
+.note { font-size: 10.5pt; border: .35mm solid var(--ink); border-radius: 3mm; padding: 2mm 4mm; margin: 3mm 0; }
+h2.sec { font-family: var(--title); font-weight: normal; font-size: 15pt; margin: 4mm 0 2mm; }
+
+/* ---------- QR ---------- */
+.qrgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.qrc { border: .4mm solid var(--ink); border-radius: 4mm; padding: 3mm; text-align: center; break-inside: avoid; }
+.qrc svg { width: 30mm; height: 30mm; display: block; margin: 0 auto 1.5mm; }
+.qrc .t { font-weight: 700; font-size: 12pt; }
+.qrc .d { font-size: 9.5pt; color: var(--soft); }
+.qrc .u { font-family: var(--en); font-size: 7.5pt; direction: ltr; color: var(--soft); word-break: break-all; }
+.qrc .s { font-size: 8.5pt; border: .3mm solid var(--line); border-radius: 99px; display: inline-block; padding: 0 2mm; margin-top: 1mm; }
+.qr-inline { display: inline-flex; align-items: center; gap: 2mm; }
+.qr-inline svg { width: 17mm; height: 17mm; }
+
+/* ---------- כתיבה באנגלית: 4 שורות ---------- */
+.hw { display: block; width: 100%; }
+.hw text { font-family: var(--en); }
+.hw .solid { fill: var(--ink); }
+.hw .trace { fill: none; stroke: #444; stroke-width: 1.8; stroke-dasharray: 3 2.6; }
+.checklist { display: flex; gap: 4mm; font-size: 10.5pt; justify-content: flex-start; }
+.checklist span { border: .35mm solid var(--ink); border-radius: 99px; padding: .3mm 3mm; }
+
+/* ---------- כרטיסים ---------- */
+.card-row { display: grid; grid-template-columns: 1fr 1fr; height: 39mm; border: .4mm dashed var(--soft); margin-bottom: 3mm; position: relative; }
+.card-row .fold { position: absolute; top: -1mm; bottom: -1mm; left: 50%; border-left: .4mm dotted var(--ink); }
+.card-row .fold::after { content: "מקפלים"; position: absolute; top: -3.5mm; left: -6mm; font-size: 7pt; color: var(--soft); background: #fff; padding: 0 1mm; }
+.cf, .cb { padding: 3mm 4mm; display: flex; flex-direction: column; justify-content: center; text-align: center; position: relative; }
+.cf .kind, .cb .kind { position: absolute; top: 2mm; inset-inline-start: 3mm; font-size: 8pt; border: .3mm solid var(--line); border-radius: 99px; padding: 0 2mm; }
+.cf .sqn { position: absolute; top: 1.5mm; inset-inline-end: 2.5mm; width: 13mm; height: 12mm; }
+.cf .sqn text { font-family: var(--title); }
+.cf .big { font-family: var(--en); font-size: 24pt; direction: ltr; line-height: 1.1; }
+.cf .q { font-size: 12.5pt; font-weight: 500; }
+.cb { border-inline-start: 0; }
+.cb .a { font-size: 12pt; white-space: pre-line; font-weight: 500; }
+.cb .for { position: absolute; bottom: 2mm; inset-inline-end: 3mm; font-size: 7.5pt; color: var(--soft); }
+.cb.flip { transform: rotate(180deg); }
+
+.labels { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2mm; }
+.labels div { border: .4mm dashed var(--soft); border-radius: 2mm; padding: 2mm 1mm; text-align: center; font-size: 9pt; }
+.labels b { font-family: var(--title); font-weight: normal; font-size: 16pt; display: block; }
+
+/* ---------- טבלת מעקב ---------- */
+table.track { width: 100%; border-collapse: collapse; font-size: 11pt; }
+table.track td, table.track th { border: .3mm solid var(--line); padding: 1.2mm 2mm; text-align: center; }
+table.track th { font-weight: 500; font-size: 9.5pt; }
+table.track .en { font-size: 15pt; }
+
+/* =====================================================================
+   מדריך האמא בצבע (part=mom): אותה שפה כמו "למה השיעור בנוי ככה"
+   ===================================================================== */
+@font-face { font-family: "Mush"; src: url("../assets/fonts/SKFMush-Light.otf"); }
+.mom-color {
+  --coral: #E76F51; --sand: #F4A261; --gold: #E9C46A; --teal: #2A9D8F;
+  --navy: #264653; --brown: #5A2A0C; --beige: #E6D3B9; --cream: #FBF5ED;
+  --ink: #264653; --soft: #5A2A0C; --line: #E6D3B9; --pale: #fff;
+  --he: "Mush", "Rubik", Arial, sans-serif;
+  background: var(--cream);
+}
+.mom-color body { background: var(--cream); font-size: 12pt; }
+.mom-color b, .mom-color strong { font-weight: 700; }
+.mom-color .flow { background: var(--cream); outline-color: var(--cream); }
+.mom-color a { color: inherit; text-decoration: none; }
+.mom-color .ph { border-bottom: 1mm solid var(--coral); }
+.mom-color .ph h1 { color: var(--coral); }
+.mom-color .ph .who.mom { background: var(--coral); border-color: var(--coral); }
+.mom-color h2.sec { color: var(--navy); }
+.mom-color .progress span { background: #fff; border-color: var(--beige); color: var(--brown); }
+.mom-color .prep { background: #fff; border: 1.2mm solid var(--beige); border-radius: 5mm; }
+.mom-color .prep b { color: var(--coral); }
+.mom-color .golden div { background: var(--coral); color: var(--cream); border: 0; border-radius: 4mm; padding: 1.5mm 2.5mm; }
+.mom-color .note { background: var(--navy); color: var(--cream); border: 0; border-radius: 5mm; }
+.mom-color .note b { color: var(--gold); }
+
+/* בלוקים: צבע לכל סוג */
+.mom-color .blk { background: #fff; border-radius: 5mm; padding: 3mm 5mm 3mm 4mm; border-inline-start: 2mm solid var(--c, var(--navy)); }
+.mom-color .blk.light { border-inline-start-style: solid; opacity: .95; }
+.mom-color .blk h3 { color: var(--c, var(--navy)); }
+.mom-color .blk h3 .min { border-color: var(--beige); color: var(--brown); }
+.mom-color .blk h3 .must { background: var(--coral); }
+.mom-color .blk[data-k=recall] { --c: var(--coral); }
+.mom-color .blk[data-k=sounds] { --c: var(--teal); }
+.mom-color .blk[data-k=talk]   { --c: #b8902f; }
+.mom-color .blk[data-k=move]   { --c: var(--sand); }
+.mom-color .blk[data-k=science]{ --c: var(--navy); }
+.mom-color .blk[data-k=write]  { --c: var(--brown); }
+.mom-color .blk[data-k=lock]   { --c: var(--coral); }
+.mom-color .st.say { background: var(--cream); border: .4mm solid var(--beige); }
+.mom-color .st.if { border-color: var(--sand); background: #fff8ef; }
+.mom-color .st.ref { border: .4mm solid var(--teal); color: var(--teal); background: #fff; font-weight: 700; }
+.mom-color a.st.ref:hover { background: var(--teal); color: #fff; }
+.mom-color .st.act { display: flex; align-items: center; gap: 3mm; background: var(--cream); border-radius: 4mm; padding: 2mm 3mm; width: fit-content; border: .4mm solid var(--beige); }
+.mom-color .st.act .open { font-size: 10pt; color: var(--coral); font-weight: 700; }
+.mom-color .pages-strip { background: #fff; border-radius: 4mm; padding: 2mm 4mm; margin-bottom: 4mm; font-size: 10.5pt; display: flex; flex-wrap: wrap; gap: 1.5mm; align-items: center; }
+.mom-color .pages-strip .st.ref { margin: 0; }
+.mom-color table.pron td, .mom-color table.pron th { border-bottom-color: var(--beige); }
+.mom-color table.pron .H { color: var(--coral); }
+.mom-color table.pron { background: #fff; border-radius: 4mm; overflow: hidden; }
+
+/* שער */
+.cover-mom .hero { display: flex; align-items: center; gap: 6mm; margin-bottom: 5mm; }
+.cover-mom .hero > div { flex: 1; }
+.cover-mom .kicker { color: var(--brown); font-size: 11pt; }
+.cover-mom h1.big { font-family: var(--title); font-weight: normal; font-size: 38pt; color: var(--coral); line-height: 1; }
+.cover-mom .sub { font-size: 15pt; }
+.cover-mom .hero svg path:first-of-type { fill: var(--teal); stroke: none; }
+.kidpdf { display: flex; align-items: center; gap: 4mm; background: var(--navy); color: var(--cream) !important; border-radius: 6mm; padding: 5mm 6mm; margin-bottom: 4mm; font-size: 11pt; }
+.kidpdf .ic { font-size: 22pt; }
+.kidpdf b { font-family: var(--title); font-weight: normal; font-size: 15pt; color: var(--gold); }
+.kidpdf .go { margin-inline-start: auto; background: var(--gold); color: var(--navy); border-radius: 99px; padding: 1.5mm 5mm; font-weight: 700; white-space: nowrap; }
+.cover-mom .sentence { background: #fff; border-radius: 5mm; padding: 3mm 5mm; margin-bottom: 2mm; }
+.cover-mom .sentence .en { font-size: 20pt; }
+.sess-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; }
+.sess-list a { background: #fff; border-radius: 5mm; padding: 3mm; display: flex; flex-direction: column; gap: 1mm; text-align: center; align-items: center; border: .5mm solid var(--beige); }
+.sess-list b { font-family: var(--title); font-weight: normal; font-size: 20pt; color: var(--coral); line-height: 1; }
+.sess-list small, .act-list small { color: var(--brown); font-size: 9.5pt; }
+.act-list { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-bottom: 4mm; }
+.act-list a { display: flex; gap: 3mm; align-items: center; background: #fff; border-radius: 5mm; padding: 3mm 4mm; border: .5mm solid var(--beige); }
+.act-list .ic { font-size: 18pt; }
+@media print { .mom-color .flow { outline: none; } }

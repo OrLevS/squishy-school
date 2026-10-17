@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>חוברת שבועית</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/booklet.css">
+</head>
+<body>
+<div class="toolbar">חוברת להדפסה · A4 · שחור־לבן <button onclick="print()">🖨 הדפסה / שמירה כ-PDF</button></div>
+<main id="booklet"></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="../js/config.js"></script>
+<script>document.write('<script src="../data/week-' + String(new URLSearchParams(location.search).get('w') || 1).padStart(2, '0') + '.js"><\/script>');</script>
+<script src="../js/booklet.js"></script>
+</body>
+</html>

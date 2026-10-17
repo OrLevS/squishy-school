@@ -1,0 +1,90 @@
+/* האתר: פעילויות דיגיטליות ודפי קישורים. צבעוני (מסך), פלטת LevCatom. */
+@font-face { font-family: "Pogo"; src: url("../assets/fonts/SKFPogo-Regular.otf"); }
+
+:root {
+  --coral: #E76F51; --sand: #F4A261; --gold: #E9C46A; --teal: #2A9D8F;
+  --navy: #264653; --brown: #5A2A0C; --beige: #E6D3B9; --cream: #FBF5ED;
+  --he: "Rubik", "Arial Hebrew", Arial, sans-serif;
+  --en: "Andika", "Comic Sans MS", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+body {
+  background: var(--cream); color: var(--navy);
+  font-family: var(--he); font-size: 18px; line-height: 1.5;
+  min-height: 100vh; padding: 0 16px 48px;
+}
+.en, [lang="en"] { font-family: var(--en); direction: ltr; unicode-bidi: isolate; }
+h1, h2, .title { font-family: "Pogo", var(--he); font-weight: normal; line-height: 1.15; }
+h1 { font-size: clamp(28px, 6vw, 42px); color: var(--coral); }
+h2 { font-size: 24px; }
+a { color: inherit; }
+
+.top {
+  max-width: 900px; margin: 0 auto; padding: 14px 0 10px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.top .back { text-decoration: none; font-size: 15px; background: #fff; border: 2px solid var(--beige); border-radius: 99px; padding: 4px 14px; }
+.top .crumb { font-size: 15px; color: var(--brown); }
+.wrap { max-width: 900px; margin: 0 auto; }
+.lead { font-size: 19px; margin: 6px 0 18px; }
+
+.btn {
+  font: inherit; font-size: 20px; border: 0; cursor: pointer;
+  background: var(--coral); color: #fff; border-radius: 99px; padding: 12px 26px;
+  box-shadow: 0 4px 0 #b9533b; transition: transform .12s ease, box-shadow .12s ease;
+  touch-action: manipulation; user-select: none;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b9533b; }
+.btn.alt { background: #fff; color: var(--navy); box-shadow: 0 4px 0 var(--beige); border: 2px solid var(--beige); }
+.btn.alt:active { box-shadow: 0 1px 0 var(--beige); }
+.btn.teal { background: var(--teal); box-shadow: 0 4px 0 #1d7368; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+
+.card {
+  background: #fff; border-radius: 26px; padding: 20px;
+  box-shadow: 0 2px 0 var(--beige), 0 10px 30px rgba(38,70,83,.06);
+}
+.say {
+  font-family: var(--en); direction: ltr; font-size: clamp(30px, 7vw, 46px);
+  display: inline-flex; align-items: center; gap: 12px;
+}
+.speak {
+  border: 0; background: var(--gold); width: 54px; height: 54px; border-radius: 50%;
+  font-size: 26px; cursor: pointer; flex: none; box-shadow: 0 3px 0 #c9a443;
+}
+.speak.slow { background: #fff; border: 2px solid var(--gold); box-shadow: none; font-size: 22px; width: 46px; height: 46px; }
+.speak:active { transform: translateY(2px); }
+
+.hint { font-size: 15px; color: var(--brown); background: #fff; border: 2px dashed var(--beige); border-radius: 14px; padding: 8px 14px; }
+
+/* סקווישי */
+.squishy { display: inline-block; }
+.squishy.bounce { animation: squish .7s cubic-bezier(.3,1.6,.5,1); }
+@keyframes squish {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.25, .75); }
+  60% { transform: scale(.9, 1.12); }
+  100% { transform: scale(1, 1); }
+}
+.shake { animation: shake .4s ease; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* כרטיסי קישורים */
+.links { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.link {
+  display: flex; gap: 14px; align-items: center; text-decoration: none;
+  background: #fff; border-radius: 22px; padding: 18px; border: 2px solid transparent;
+  box-shadow: 0 2px 0 var(--beige); transition: transform .15s ease, border-color .15s ease;
+}
+.link:hover { transform: translateY(-2px); border-color: var(--sand); }
+.link .ic { font-size: 36px; width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center; background: var(--cream); flex: none; }
+.link b { display: block; font-size: 20px; }
+.link small { display: block; color: var(--brown); font-size: 15px; }
+.link .tag { font-size: 13px; background: var(--cream); border-radius: 99px; padding: 1px 10px; display: inline-block; margin-top: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

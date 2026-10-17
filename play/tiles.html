@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>אריחי צלילים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<script src="../js/common.js"></script>
+<script>loadWeek('../');</script>
+<style>
+  .tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .tabs button { font: inherit; border: 2px solid var(--beige); background: #fff; border-radius: 99px; padding: 6px 18px; cursor: pointer; }
+  .tabs button[aria-pressed=true] { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .pic { font-size: 96px; line-height: 1; }
+  .center { text-align: center; }
+  .slots, .tiles { display: flex; gap: 10px; justify-content: center; direction: ltr; flex-wrap: wrap; }
+  .slot { width: 76px; height: 90px; border-radius: 18px; border: 3px dashed var(--sand); display: grid; place-items: center; font-family: var(--en); font-size: 56px; background: #fff; }
+  .slot.full { border-style: solid; border-color: var(--navy); }
+  .slot.bad { border-color: var(--coral); background: #fde8e2; }
+  .slot.good { border-color: var(--teal); background: #dff1ee; }
+  .tile {
+    width: 78px; height: 92px; border-radius: 18px; border: 0; cursor: pointer;
+    background: var(--gold); box-shadow: 0 5px 0 #c9a443; font-family: var(--en); font-size: 48px; color: var(--navy);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1;
+    touch-action: manipulation;
+  }
+  .tile small { font-family: var(--he); font-size: 18px; margin-top: 4px; opacity: .8; }
+  .tile:active { transform: translateY(3px); box-shadow: 0 2px 0 #c9a443; }
+  .nohint .tile small { display: none; }
+  .msg { font-size: 22px; min-height: 36px; text-align: center; margin: 10px 0; font-weight: 500; }
+  .prog { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+  .prog span { width: 14px; height: 14px; border-radius: 50%; background: var(--beige); }
+  .prog span.done { background: var(--teal); }
+  .prog span.now { outline: 3px solid var(--sand); }
+  .readword { font-family: var(--en); font-size: 84px; direction: ltr; letter-spacing: 6px; }
+</style>
+</head>
+<body>
+<div class="top"><a class="back" id="back" href="../w1/">→ לכל הפעילויות</a><span class="crumb">אנגלית · צלילים</span></div>
+<main class="wrap">
+  <h1>אריחי צלילים</h1>
+  <div class="tabs" role="group">
+    <button aria-pressed="true" data-m="build">🧩 מרכיבים</button>
+    <button aria-pressed="false" data-m="read">📖 קוראים</button>
+  </div>
+  <div class="card" id="card"></div>
+  <div class="prog" id="prog"></div>
+  <p class="center" style="margin-top:14px"><label><input type="checkbox" id="hint" checked> רמז בעברית על האריחים</label></p>
+</main>
+<script>
+const Wk = WEEKS[weekNo()];
+document.getElementById('back').href = `../w${Wk.n}/`;
+const $ = id => document.getElementById(id);
+const letters = Wk.sounds.map(s => s.l);
+const heOf = Object.fromEntries(Wk.sounds.map(s => [s.l, s.he]));
+let mode = 'build', i = 0, filled = [];
+
+function progress() {
+  $('prog').innerHTML = Wk.words.map((_, k) => `<span class="${k < i ? 'done' : k === i ? 'now' : ''}"></span>`).join('');
+}
+function build() {
+  const w = Wk.words[i];
+  filled = [];
+  $('card').innerHTML = `
+    <div class="center">
+      <div class="pic">${w.e}</div>
+      <div class="btn-row" style="margin:8px 0">
+        <button class="speak" id="hear" aria-label="שומעים את המילה">🔊</button>
+        <button class="speak slow" id="slow" aria-label="שומעים לאט">🐢</button>
+      </div>
+      <div style="color:var(--brown)">${w.he}</div>
+    </div>
+    <div class="slots" id="slots" style="margin:18px 0">${[...w.w].map(() => '<div class="slot"></div>').join('')}</div>
+    <div class="msg" id="msg">שומעים את המילה, ולוחצים על האריחים לפי הסדר.</div>
+    <div class="tiles">${letters.map(l => `<button class="tile" data-l="${l}">${l}<small>${heOf[l]}</small></button>`).join('')}</div>
+    <div class="btn-row"><button class="btn alt" id="del">⌫ מוחקים</button><button class="btn teal" id="check">✔ בודקים</button></div>`;
+  $('hear').onclick = () => say(w.w);
+  $('slow').onclick = () => say(w.w, true);
+  document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
+    if (filled.length >= w.w.length) return;
+    filled.push(t.dataset.l); paint();
+  });
+  $('del').onclick = () => { filled.pop(); paint(); };
+  $('check').onclick = () => check(w);
+  setTimeout(() => say(w.w), 300);
+}
+function paint() {
+  [...$('slots').children].forEach((s, k) => {
+    s.textContent = filled[k] || ''; s.className = 'slot' + (filled[k] ? ' full' : '');
+  });
+}
+function check(w) {
+  if (filled.length < w.w.length) { $('msg').textContent = `חסרים עוד ${w.w.length - filled.length} צלילים.`; return; }
+  let ok = true;
+  [...$('slots').children].forEach((s, k) => {
+    const good = filled[k] === w.w[k]; ok = ok && good;
+    s.classList.add(good ? 'good' : 'bad');
+  });
+  if (ok) {
+    $('msg').innerHTML = `${squishySVG('#2A9D8F', 54)} <span>מעולה! <span class="en">${w.w}</span></span>`;
+    bounce($('msg').querySelector('svg'));
+    say(w.w);
+    $('check').outerHTML = `<button class="btn" id="next">${i < Wk.words.length - 1 ? 'המילה הבאה ←' : '🎉 סיימנו! עוד סיבוב'}</button>`;
+    $('next').onclick = () => { i = (i + 1) % Wk.words.length; progress(); render(); };
+  } else {
+    $('msg').textContent = 'כמעט! בואי נבדוק את הצלילים האדומים. אומרים כל צליל לאט.';
+    $('slots').classList.remove('shake'); void $('slots').offsetWidth; $('slots').classList.add('shake');
+  }
+}
+function read() {
+  const w = Wk.words[i];
+  $('card').innerHTML = `
+    <div class="center">
+      <div class="readword">${w.w}</div>
+      <div class="msg">קוראים בקול: צליל אחרי צליל, ואז את כל המילה.</div>
+      <div class="btn-row"><button class="btn teal" id="reveal">👀 בודקים</button></div>
+      <div id="ans" hidden><div class="pic">${w.e}</div>
+        <div class="btn-row"><button class="speak" id="hear">🔊</button><button class="speak slow" id="slow">🐢</button></div>
+        <div style="color:var(--brown)">${w.he}</div>
+        <div class="btn-row"><button class="btn" id="next">${i < Wk.words.length - 1 ? 'המילה הבאה ←' : '🎉 עוד סיבוב'}</button></div></div>
+    </div>`;
+  $('reveal').onclick = () => { $('ans').hidden = false; $('reveal').hidden = true; say(w.w); };
+  $('hear').onclick = () => say(w.w);
+  $('slow').onclick = () => say(w.w, true);
+  $('next').onclick = () => { i = (i + 1) % Wk.words.length; progress(); render(); };
+}
+function render() { mode === 'build' ? build() : read(); }
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  mode = b.dataset.m; i = 0; progress(); render();
+});
+$('hint').onchange = e => document.body.classList.toggle('nohint', !e.target.checked);
+progress(); render();
+</script>
+</body>
+</html>

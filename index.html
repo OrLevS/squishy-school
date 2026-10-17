@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>בית הספר של סקווישי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/common.js"></script>
+<script src="data/week-01.js"></script>
+</head>
+<body>
+<main class="wrap" style="padding-top:28px">
+  <div style="display:flex;align-items:center;gap:16px" id="hero"></div>
+  <p class="lead">אנגלית, גאוגרפיה ומדעים. כל שבוע: חוברת מודפסת, ופה כל הפעילויות שה־QR מוביל אליהן.</p>
+  <h2 style="margin:20px 0 10px">השבועות</h2>
+  <div class="links" id="weeks"></div>
+  <h2 style="margin:28px 0 10px">לאמא</h2>
+  <div class="links">
+    <a class="link" href="pdf/מדריך-לאמא-צבע.pdf"><span class="ic">📘</span><span><b>למה השיעור בנוי ככה</b><small>3 עמודים. כדאי לקרוא לפני שבוע 1.</small></span></a>
+    <a class="link" href="pdf/מדריך-לאמא-להדפסה-שחור-לבן.pdf"><span class="ic">🖨</span><span><b>אותו מדריך להדפסה</b><small>שחור־לבן</small></span></a>
+  </div>
+</main>
+<script>
+document.getElementById('hero').innerHTML = `${squishySVG('#E76F51', 96)}<h1>בית הספר של סקווישי</h1>`;
+document.getElementById('weeks').innerHTML = Object.values(WEEKS).map(w =>
+  `<a class="link" href="w${w.n}/"><span class="ic" style="font-family:Pogo;font-size:30px">${w.n}</span><span><b>${w.title}</b><small>${w.subtitle}</small></span></a>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>למה השיעור בנוי ככה</title>
+<style>
+@font-face { font-family: "Pogo"; src: url("assets/fonts/SKFPogo-Regular.otf"); }
+@font-face { font-family: "Mush"; src: url("assets/fonts/SKFMush-Light.otf"); }
+@font-face { font-family: "Limonit"; src: url("assets/fonts/SKFLimonit-Light.otf"); }
+
+:root {
+  --coral: #E76F51; --sand: #F4A261; --gold: #E9C46A; --teal: #2A9D8F;
+  --navy: #264653; --brown: #5A2A0C; --beige: #E6D3B9; --cream: #FBF5ED;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--beige);
+  color: var(--navy);
+  font-family: "Mush", "Assistant", "Arial Hebrew", Arial, sans-serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.page {
+  width: 210mm; height: 297mm;
+  margin: 10mm auto;
+  padding: 12mm 15mm 10mm;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(38,70,83,.12);
+  display: flex; flex-direction: column;
+}
+h1, h2, h3 { font-family: "Pogo", "Mush", sans-serif; font-weight: normal; line-height: 1.15; }
+h1 { font-size: 30pt; color: var(--coral); }
+h2 { font-size: 17pt; color: var(--navy); margin-bottom: 3mm; }
+h3 { font-size: 13.5pt; }
+b, strong { font-family: "Mush"; font-weight: 700; }
+em { font-family: "Limonit"; font-style: normal; }
+p + p { margin-top: 2mm; }
+
+.kicker { font-size: 11pt; color: var(--brown); letter-spacing: .02em; }
+.header { display: flex; align-items: center; gap: 6mm; margin-bottom: 5mm; }
+.header .txt { flex: 1; }
+.lead { font-size: 12.5pt; margin-top: 1.5mm; }
+
+.big-idea {
+  background: var(--navy); color: var(--cream);
+  border-radius: 7mm; padding: 5mm 8mm; margin: 3mm 0 5mm;
+  display: flex; gap: 6mm; align-items: center;
+}
+.big-idea .quote { font-family: "Pogo"; font-size: 19pt; line-height: 1.25; color: var(--gold); }
+.big-idea p { font-size: 11pt; margin-top: 2mm; }
+
+.tool {
+  border-radius: 6mm; padding: 4mm 6mm; margin-bottom: 3.5mm;
+  background: #fff; border: 1.2mm solid var(--beige);
+}
+.tool-head { display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
+.tool-head .ico {
+  width: 11mm; height: 11mm; border-radius: 50%;
+  display: grid; place-items: center; font-size: 15pt; flex: none;
+}
+.tool-head .tag { font-size: 10pt; color: var(--brown); margin-inline-start: auto; }
+.rows { display: grid; grid-template-columns: 22mm 1fr; gap: 1mm 3mm; font-size: 11pt; }
+.rows dt { font-family: "Pogo"; font-size: 10.5pt; padding-top: .6mm; }
+.rows dd.temp { color: var(--brown); }
+.rows dd.instead { font-weight: 700; }
+
+.c-coral .ico { background: var(--coral); } .c-coral dt { color: var(--coral); }
+.c-teal .ico { background: var(--teal); }   .c-teal dt { color: var(--teal); }
+.c-gold .ico { background: var(--gold); }   .c-gold dt { color: var(--brown); }
+.c-sand .ico { background: var(--sand); }   .c-sand dt { color: var(--brown); }
+.c-navy .ico { background: var(--navy); }   .c-navy dt { color: var(--navy); }
+
+/* Leitner diagram */
+.box-diagram { margin: 3mm 0 2mm; }
+.box-diagram svg { width: 100%; height: auto; display: block; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-bottom: 4mm; }
+.panel { border-radius: 6mm; padding: 4mm 6mm; }
+.panel h3 { margin-bottom: 2mm; }
+.panel ul { list-style: none; }
+.panel li { padding: .5mm 0; padding-inline-start: 6mm; position: relative; font-size: 11.5pt; }
+.panel li::before { position: absolute; inset-inline-start: 0; }
+.flex-panel { background: #fff; border: 1.2mm dashed var(--sand); }
+.flex-panel li::before { content: "↔"; color: var(--sand); }
+.fixed-panel { background: var(--navy); color: var(--cream); }
+.fixed-panel h3 { color: var(--gold); }
+.fixed-panel li::before { content: "●"; color: var(--gold); }
+
+.rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-bottom: 4mm; }
+.rule { background: var(--coral); color: var(--cream); border-radius: 6mm; padding: 4mm 5mm; text-align: center; }
+.rule .n { font-family: "Pogo"; font-size: 22pt; line-height: 1; color: var(--gold); }
+.rule .t { font-family: "Pogo"; font-size: 13pt; margin: 1.5mm 0 1mm; }
+.rule .s { font-size: 10.5pt; }
+
+.faq dt { font-family: "Pogo"; font-size: 12pt; color: var(--coral); margin-top: 2.2mm; }
+.faq dd { font-size: 11pt; }
+
+.short-session {
+  background: #fff; border-radius: 6mm; padding: 4mm 6mm; margin-bottom: 5mm;
+  border: 1.2mm solid var(--beige);
+}
+.timeline { display: flex; gap: 2mm; margin-top: 2mm; }
+.timeline div { border-radius: 4mm; padding: 2mm 3mm; font-size: 10.5pt; text-align: center; color: var(--cream); }
+
+.foot {
+  margin-top: auto; padding-top: 3mm;
+  display: flex; justify-content: space-between; font-size: 9.5pt; color: var(--brown);
+}
+.wave { position: absolute; left: 0; right: 0; bottom: 0; height: 9mm; }
+
+@page { size: A4; margin: 0; }
+@media print {
+  body { background: none; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+}
+@media screen and (max-width: 820px) {
+  .page { width: auto; height: auto; margin: 0 0 4mm; padding: 20px 16px 40px; box-shadow: none; }
+  .two-col, .rules { grid-template-columns: 1fr; }
+  .big-idea { flex-direction: column; text-align: center; }
+  .rows { grid-template-columns: 1fr; }
+  .rows dt { margin-top: 2mm; }
+  h1 { font-size: 26pt; }
+}
+
+/* ---- מצב שחור־לבן (מדפסת ביתית): ?bw ---- */
+.bw { --coral:#222; --sand:#555; --gold:#222; --teal:#222; --navy:#111; --brown:#444; --beige:#bbb; --cream:#fff; }
+.bw body { background:#fff; }
+.bw .page { background:#fff; box-shadow:none; }
+.bw h1 { color:#111; }
+.bw .big-idea { background:#fff; color:#111; border:1.4mm solid #111; }
+.bw .big-idea .quote { color:#111; }
+.bw .tool { border:.6mm solid #999; }
+.bw .tool-head .ico { background:#fff !important; border:.6mm solid #111; filter:grayscale(1); }
+.bw .rule { background:#fff; color:#111; border:.8mm solid #111; }
+.bw .rule .n { color:#111; }
+.bw .fixed-panel { background:#fff; color:#111; border:1.2mm solid #111; }
+.bw .fixed-panel h3, .bw .fixed-panel li::before { color:#111; }
+.bw .flex-panel { border-color:#777; }
+.bw .timeline div { background:#fff !important; color:#111 !important; border:.6mm solid #111; }
+.bw .box-diagram { filter:grayscale(1); }
+.bw .header svg { color:#e4e4e4 !important; }
+.bw .foot { color:#555; }
+</style>
+<script>if (/[?&]bw(=|&|$)/.test(location.search)) document.documentElement.classList.add('bw');</script>
+</head>
+<body>
+
+<!-- סקווישי: הדמות שחוזרת בכל החומרים -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="squishy" viewBox="0 0 100 90">
+      <path d="M50 6 C78 4 96 22 95 48 C94 74 76 86 50 86 C24 86 6 74 5 48 C4 22 22 8 50 6 Z" fill="currentColor"/>
+      <ellipse cx="33" cy="30" rx="10" ry="6" fill="#FBF5ED" opacity=".55"/>
+      <circle cx="37" cy="47" r="4.5" fill="#264653"/>
+      <circle cx="63" cy="47" r="4.5" fill="#264653"/>
+      <path d="M42 59 Q50 66 58 59" stroke="#264653" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="27" cy="58" rx="5" ry="3" fill="#E76F51" opacity=".45"/>
+      <ellipse cx="73" cy="58" rx="5" ry="3" fill="#E76F51" opacity=".45"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ===================== עמוד 1 ===================== -->
+<section class="page">
+  <div class="header">
+    <div class="txt">
+      <div class="kicker">מדריך לאמא · לקרוא פעם אחת לפני שמתחילות</div>
+      <h1>למה השיעור בנוי ככה</h1>
+      <p class="lead">בכל מפגש יש כמה רגעים שנראים כמו בזבוז זמן: לשאול לפני שמסבירים, לבקש ניחוש כשהיא בטח לא יודעת, לחזור על משהו שהיא ידעה כבר אתמול.</p>
+      <p class="lead"><b>אלה לא בזבוז זמן. אלה הרגעים שבהם הלמידה נשמרת.</b> הדף הזה מסביר למה, כדי שלא יהיה מפתה לדלג עליהם.</p>
+    </div>
+    <svg width="34mm" height="31mm" style="color:var(--teal);flex:none"><use href="#squishy"/></svg>
+  </div>
+
+  <div class="big-idea">
+    <div>
+      <div class="quote">מה שקל – נשכח.<br>מה שקצת מתאמץ – נשאר.</div>
+      <p>כשמסבירים לה שוב, או כשהיא קוראת שוב, זה מרגיש כאילו היא יודעת, כי זה מוכר. אבל המוח לא התאמן על הדבר החשוב: <b>לשלוף את זה לבד, מתוך הראש.</b></p>
+      <p>הזיכרון מתחזק בכל פעם ששולפים ממנו, ובמיוחד כשזה קצת קשה. לכן כשהיא מתאמצת להיזכר, זה לא סימן שמשהו לא עובד. זה הסימן שזה עובד.</p>
+    </div>
+  </div>
+
+  <h2>חמשת הרגעים שלא מדלגים עליהם</h2>
+  <p style="font-size:11.5pt;margin-bottom:4mm">בכל אחד מהם: מה עושים, למה זה עובד, מה מפתה לעשות, ומה לעשות במקום.</p>
+
+  <div class="tool c-coral">
+    <div class="tool-head">
+      <div class="ico">🔁</div>
+      <h3>זוכרים?</h3>
+      <span class="tag">תחילת כל מפגש · 3–5 דקות</span>
+    </div>
+    <dl class="rows">
+      <dt>מה עושים</dt><dd>שואלות על מה שלמדנו בפעם הקודמת, <b>לפני</b> שפותחות דף או מסך.</dd>
+      <dt>למה</dt><dd>הניסיון להיזכר הוא עצמו התרגיל. הוא מחזק את הזיכרון הרבה יותר מעוד הסבר.</dd>
+      <dt>הפיתוי</dt><dd class="temp">לתת רמז אחרי שתי שניות, או פשוט להגיד את התשובה כדי להתקדם.</dd>
+      <dt>במקום</dt><dd class="instead">לספור בראש עד 5. אם צריך עזרה: קודם רמז קטן (הצליל הראשון, "זה קשור לפנס..."), ורק אחר כך התשובה.</dd>
+    </dl>
+  </div>
+
+  <div class="tool c-teal">
+    <div class="tool-head">
+      <div class="ico">🤔</div>
+      <h3>מנחשים</h3>
+      <span class="tag">לפני כל ניסוי, סרטון או חוק חדש</span>
+    </div>
+    <dl class="rows">
+      <dt>מה עושים</dt><dd>היא בוחרת תשובה <b>ומסמנת אותה</b> בדף, לפני שרואים מה נכון.</dd>
+      <dt>למה</dt><dd>כשהמוח הימר והופתע, הוא שם לב במיוחד ו"מעדכן את המפה". גם ניחוש שגוי מוביל ללמידה טובה יותר מאשר בלי ניחוש בכלל.</dd>
+      <dt>הפיתוי</dt><dd class="temp">לדלג כי "היא ממילא לא יודעת", או לקבל "לא יודעת" כתשובה.</dd>
+      <dt>במקום</dt><dd class="instead">"בניחוש אין טעויות. אם היית חייבת לבחור, מה היית בוחרת?" ואחרי שבודקים: "מה הפתיע אותך?"</dd>
+    </dl>
+  </div>
+
+  <div class="foot"><span>LevCatom · תוכנית חינוך ביתי</span><span>1 / 3</span></div>
+</section>
+
+<!-- ===================== עמוד 2 ===================== -->
+<section class="page">
+
+  <div class="tool c-gold">
+    <div class="tool-head">
+      <div class="ico">🫧</div>
+      <h3>קופסת הסקווישים</h3>
+      <span class="tag">כל מפגש · 5 דקות · עד 10 כרטיסים</span>
+    </div>
+    <dl class="rows">
+      <dt>מה עושים</dt><dd>כל שיעור משאיר כמה כרטיסי זיכרון קטנים. הם נכנסים לקופסה עם 5 תאים, וכל כרטיס עובר בין התאים לפי מה שהיא זוכרת.</dd>
+      <dt>למה</dt><dd>שוכחים הכי מהר בימים הראשונים אחרי שלומדים. חזרה בדיוק כשמתחילים לשכוח "מאפסת" את השכחה, והפעם היא תהיה איטית יותר. חמש דקות מפוזרות על פני שבועות שוות יותר משעה אחת ברצף.</dd>
+      <dt>הפיתוי</dt><dd class="temp">לדלג על כרטיס כי "היא ידעה את זה אתמול", או לעבור על כל הכרטיסים בבת אחת.</dd>
+      <dt>במקום</dt><dd class="instead">לעבור רק על התאים של היום. הקופסה כבר מחליטה מתי לחזור על מה.</dd>
+    </dl>
+
+    <div class="box-diagram">
+      <svg viewBox="0 0 720 236" role="img" aria-label="חמשת התאים של הקופסה: כרטיס שהיא יודעת עובר תא קדימה, כרטיס שעוד לא חוזר לתא 1">
+        <style>
+          .bx { font-family: Pogo, Mush, sans-serif; }
+          .sm { font-family: Mush, sans-serif; font-size: 15px; fill: #264653; }
+        </style>
+        <!-- arrow back to box 1 -->
+        <path d="M120 160 Q360 206 600 160" stroke="#E76F51" stroke-width="3" fill="none" stroke-dasharray="7 6" marker-end="url(#ah-c)"/>
+        <defs>
+          <marker id="ah-c" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#E76F51"/></marker>
+          <marker id="ah-t" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2A9D8F"/></marker>
+        </defs>
+        <text x="360" y="226" text-anchor="middle" class="sm" style="fill:#E76F51">עוד לא? הכרטיס חוזר לתא 1. בלי דרמה, ככה הקופסה עובדת.</text>
+
+        <!-- boxes, right to left -->
+        <g class="bx">
+          <g transform="translate(600 40)">
+            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#E76F51">1</text>
+            <text x="0" y="56" text-anchor="middle" class="sm">כל מפגש</text>
+            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#E76F51"/>
+          </g>
+          <g transform="translate(480 40)">
+            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#F4A261">2</text>
+            <text x="0" y="56" text-anchor="middle" class="sm">מפגש כן,</text>
+            <text x="0" y="74" text-anchor="middle" class="sm">מפגש לא</text>
+            <use href="#squishy" x="-14" y="80" width="28" height="25" style="color:#F4A261"/>
+          </g>
+          <g transform="translate(360 40)">
+            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#c9a443">3</text>
+            <text x="0" y="56" text-anchor="middle" class="sm">פעם בשבוע</text>
+            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#E9C46A"/>
+          </g>
+          <g transform="translate(240 40)">
+            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#2A9D8F">4</text>
+            <text x="0" y="56" text-anchor="middle" class="sm">פעם</text>
+            <text x="0" y="74" text-anchor="middle" class="sm">בשבועיים</text>
+            <use href="#squishy" x="-14" y="80" width="28" height="25" style="color:#2A9D8F"/>
+          </g>
+          <g transform="translate(120 40)">
+            <rect x="-52" y="0" width="104" height="110" rx="18" fill="#fff" stroke="#E6D3B9" stroke-width="4"/>
+            <text x="0" y="30" text-anchor="middle" font-size="24" fill="#264653">5</text>
+            <text x="0" y="56" text-anchor="middle" class="sm">פעם בחודש</text>
+            <use href="#squishy" x="-18" y="68" width="36" height="32" style="color:#264653"/>
+          </g>
+          <!-- forward arrows -->
+          <g stroke="#2A9D8F" stroke-width="3" fill="none" marker-end="url(#ah-t)">
+            <path d="M546 95 L538 95"/><path d="M426 95 L418 95"/><path d="M306 95 L298 95"/><path d="M186 95 L178 95"/>
+          </g>
+          <text x="360" y="22" text-anchor="middle" class="sm" style="fill:#2A9D8F">ידעה? הכרטיס עובר תא אחד שמאלה</text>
+          <!-- hall of fame -->
+          <g transform="translate(30 70)">
+            <text x="0" y="0" text-anchor="middle" font-size="26">🏆</text>
+            <text x="0" y="26" text-anchor="middle" class="sm">צנצנת</text>
+            <text x="0" y="44" text-anchor="middle" class="sm">האלופים</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="tool c-sand">
+    <div class="tool-head">
+      <div class="ico">🎓</div>
+      <h3>תלמדי את אמא</h3>
+      <span class="tag">סוף כל נושא · 2–3 דקות</span>
+    </div>
+    <dl class="rows">
+      <dt>מה עושים</dt><dd>היא מסבירה לך את מה שלמדו, ואת "שוכחת" ומבולבלת בכוונה.</dd>
+      <dt>למה</dt><dd>כדי להסביר צריך לסדר את הידע בראש. ככה גם מתגלים החורים, לה ולך.</dd>
+      <dt>הפיתוי</dt><dd class="temp">להשלים לה משפטים כשהיא נתקעת.</dd>
+      <dt>במקום</dt><dd class="instead">לשאול: "ואיך את יודעת?" או "תראי לי על הכדור".</dd>
+    </dl>
+  </div>
+
+  <div class="tool c-navy">
+    <div class="tool-head">
+      <div class="ico">✏️</div>
+      <h3>מכסים וכותבים</h3>
+      <span class="tag">בדפי הכתיבה באנגלית</span>
+    </div>
+    <dl class="rows">
+      <dt>מה עושים</dt><dd>מסתכלות על המשפט, אומרות אותו בקול, מקפלות את הדף כדי לכסות אותו, כותבות, ואז פותחות ובודקות.</dd>
+      <dt>למה</dt><dd>כשמעתיקים אות־אות ומסתכלים, הזיכרון לא עובד. כשמכסים, היא חייבת להחזיק את המילה בראש, וזו שוב שליפה.</dd>
+      <dt>הפיתוי</dt><dd class="temp">לוותר על הכיסוי כשהיא עייפה.</dd>
+      <dt>במקום</dt><dd class="instead">לקצר את המשפט, אבל לא לדלג על השלב.</dd>
+    </dl>
+  </div>
+
+  <div class="foot"><span>LevCatom · תוכנית חינוך ביתי</span><span>2 / 3</span></div>
+</section>
+
+<!-- ===================== עמוד 3 ===================== -->
+<section class="page">
+  <h2 style="font-size:22pt;color:var(--coral)">שלושה כללי זהב</h2>
+  <div class="rules">
+    <div class="rule"><div class="n">5</div><div class="t">שניות</div><div class="s">לחכות לפני שעוזרים. השקט הזה הוא הזמן שבו היא חושבת.</div></div>
+    <div class="rule"><div class="n">?</div><div class="t">"בואי נבדוק"</div><div class="s">במקום "לא נכון". הטעות היא חלק מהשיעור, לא כישלון שלו.</div></div>
+    <div class="rule"><div class="n">★</div><div class="t">לשבח את הדרך</div><div class="s">"ראיתי שניסית להיזכר" ולא "את חכמה". ככה היא לומדת מה עוזר.</div></div>
+  </div>
+
+  <h2>ביום קשה: מה גמיש ומה לא</h2>
+  <div class="two-col">
+    <div class="panel flex-panel">
+      <h3 style="color:var(--brown)">אפשר לקצר או לוותר</h3>
+      <ul>
+        <li>הסרטון</li>
+        <li>הפעילות העצמאית</li>
+        <li>דף תרגול נוסף</li>
+        <li>אורך השיחה</li>
+        <li>אורך משפט הכתיבה</li>
+      </ul>
+    </div>
+    <div class="panel fixed-panel">
+      <h3>לא מדלגים, גם בגרסה קצרה</h3>
+      <ul>
+        <li>זוכרים?</li>
+        <li>הניחוש לפני הבדיקה</li>
+        <li>קופסת הסקווישים</li>
+        <li>"דבר אחד שלמדתי היום"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="short-session">
+    <h3 style="color:var(--navy)">מפגש מינימום: 20 דקות שעדיין עובדות</h3>
+    <div class="timeline">
+      <div style="background:var(--gold);color:var(--navy);flex:5">🫧 קופסה · 5</div>
+      <div style="background:var(--coral);flex:10">🤔 ניחוש + בדיקה · 10</div>
+      <div style="background:var(--teal);flex:5">✏️ משפט אחד · 5</div>
+    </div>
+  </div>
+
+  <h2>שאלות שעולות</h2>
+  <dl class="faq">
+    <dt>היא טועה כמעט בכל ניחוש. זה בסדר?</dt>
+    <dd>כן, ככה זה אמור להיות. המטרה של הניחוש היא לא לצדוק אלא להתחייב לתשובה. טעויות שמתגלות ומפתיעות הן מהדברים שנזכרים הכי טוב.</dd>
+
+    <dt>היא אומרת "משעמם, אני כבר יודעת".</dt>
+    <dd>מעולה. עונים מהר, והכרטיס מתקדם תא. ככה הוא יחזור רק בעוד שבוע, ואחר כך בעוד שבועיים. זה בדיוק מה שהקופסה עושה.</dd>
+
+    <dt>אני לא בטוחה איך מבטאים מילה באנגלית.</dt>
+    <dd>לכל מילה ולכל צליל יש קישור או QR עם הקלטה. מקשיבות ביחד וחוזרות אחריה. ליד כל צליל יש גם הסבר בעברית איך מבטאים. כשהיא רואה שגם את לומדת, זה דווקא עוזר.</dd>
+
+    <dt>כמה זמן עד שרואים התקדמות?</dt>
+    <dd>בשבועות הראשונים זה עשוי להרגיש איטי, כי חלק גדול מהזמן הולך לחזרה. כדאי לשמור את דפי הכתיבה: ההבדל נראה הכי טוב כשמניחים דף משבוע 1 ליד דף משבוע 6.</dd>
+
+    <dt>משהו לא עבד או היה קשה מדי.</dt>
+    <dd>לסמן בדף המעקב השבועי ולכתוב מילה אחת למה. ככה אפשר להתאים את השבוע הבא אליה.</dd>
+  </dl>
+
+  <div class="foot"><span>LevCatom · תוכנית חינוך ביתי</span><span>3 / 3</span></div>
+</section>
+
+</body>
+</html>

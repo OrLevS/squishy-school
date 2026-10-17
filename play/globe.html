@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כדור הארץ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<style>
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } }
+  .globe-box { position: relative; background: #fff; border-radius: 30px; padding: 10px; touch-action: none; }
+  #globe { width: 100%; height: auto; display: block; cursor: grab; }
+  #globe:active { cursor: grabbing; }
+  .ocean { fill: #cfe7e3; stroke: #2A9D8F; stroke-width: 1.5; }
+  .grat { fill: none; stroke: #2A9D8F; stroke-opacity: .18; stroke-width: .6; }
+  .country { fill: #E6D3B9; stroke: #FBF5ED; stroke-width: .5; }
+  .hl-asia { fill: #F4A261; }
+  .hl-main { fill: #E76F51; }
+  .hl-teal { fill: #2A9D8F; }
+  .lbl { font-family: "Pogo", Rubik, sans-serif; font-size: 20px; fill: #264653; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+  .side { display: flex; flex-direction: column; gap: 14px; }
+  .count { display: flex; gap: 10px; }
+  .count div { flex: 1; text-align: center; background: #fff; border-radius: 20px; padding: 10px; }
+  .count b { display: block; font-family: "Pogo", Rubik; font-size: 40px; line-height: 1; }
+  .dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .dots span { aspect-ratio: 1; border-radius: 50%; border: 2px dashed var(--beige); display: grid; place-items: center; font-size: 13px; }
+  .dots span.w { background: #cfe7e3; border: 2px solid var(--teal); }
+  .dots span.l { background: var(--beige); border: 2px solid var(--brown); }
+  .msg { font-size: 22px; text-align: center; min-height: 34px; font-weight: 500; }
+  .guess { display: flex; flex-direction: column; gap: 10px; }
+  .overlay { position: absolute; inset: 10px; display: grid; place-items: center; background: #fff; border-radius: 24px; text-align: center; }
+  .overlay .big { font-size: 120px; line-height: 1; }
+  .rings { width: 100%; max-width: 300px; margin: 0 auto; display: block; }
+  .rings circle { fill: none; stroke: var(--navy); stroke-width: 2; transform-origin: 150px 150px; transition: opacity .5s ease, transform .6s cubic-bezier(.2,1.4,.4,1); }
+  .rings text { font-family: Rubik; font-size: 14px; fill: var(--navy); text-anchor: middle; transition: opacity .5s ease; }
+  .rings .off { opacity: 0; transform: scale(.6); }
+  input[type=range] { width: 100%; accent-color: var(--coral); height: 30px; }
+  .result { background: #fff; border-radius: 22px; padding: 16px; font-size: 18px; }
+</style>
+</head>
+<body>
+<div class="top"><a class="back" id="back" href="../w1/">→ לכל הפעילויות</a><span class="crumb" id="crumb"></span></div>
+<main class="wrap">
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+  <div class="stage">
+    <div class="globe-box">
+      <svg id="globe" viewBox="0 0 600 560" role="img" aria-label="כדור הארץ. אפשר לסובב בגרירה."></svg>
+      <div class="overlay" id="overlay" hidden></div>
+    </div>
+    <div class="side" id="side"></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="../js/common.js"></script>
+<script>
+const mode = new URLSearchParams(location.search).get('m') || 'toss';
+document.getElementById('back').href = `../w${weekNo()}/`;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const side = $('side');
+
+const W = 600, H = 560, C = [W / 2, H / 2];
+const svg = d3.select('#globe');
+const R0 = 255;
+let projection = d3.geoOrthographic().scale(R0).translate(C).clipAngle(90).rotate([-35, -20]);
+let path = d3.geoPath(projection);
+const graticule = d3.geoGraticule10();
+
+const gOcean = svg.append('path').attr('class', 'ocean');
+const gGrat = svg.append('path').attr('class', 'grat');
+const gLand = svg.append('g');
+const gExtra = svg.append('g');
+const gLabels = svg.append('g');
+
+let countries = [], land = null, byId = {};
+let highlights = {};   // id -> class
+let labels = [];       // {lonlat, text}
+let marker = null;     // [lon, lat]
+let extraDraw = null;  // פונקציה לציור נוסף (רוסיה האסייתית)
+
+// מרכז החזית של הכדור (לבדיקה אם נקודה נראית), בלי invert שאין להטלה המשולבת
+const front = () => { const r = projection.rotate(); return [-r[0], -r[1]]; };
+const seen = ll => { const c = projection.clipAngle(); return !c || d3.geoDistance(ll, front()) < c * Math.PI / 180; };
+function render() {
+  // בזמן השיטוח הים ממלא את כל המסגרת, כמו במפה
+  gOcean.attr('d', projection.clipAngle() === 90 ? path({ type: 'Sphere' }) : `M0,0H${W}V${H}H0Z`);
+  gGrat.attr('d', path(graticule));
+  gLand.selectAll('path').data(countries).join('path')
+    .attr('class', d => 'country ' + (highlights[d.id] || ''))
+    .attr('d', path);
+  gExtra.html('');
+  if (extraDraw) extraDraw();
+  if (marker) {
+    const p = projection(marker);
+    const visible = seen(marker);
+    if (p && visible) gExtra.append('g').attr('transform', `translate(${p})`).html(
+      `<circle r="11" fill="#E76F51" stroke="#fff" stroke-width="4"/><text y="-18" text-anchor="middle" font-size="30">👍</text>`);
+  }
+  gLabels.html('');
+  labels.forEach(l => {
+    const p = projection(l.lonlat);
+    const visible = seen(l.lonlat);
+    if (p && visible) gLabels.append('text').attr('class', 'lbl').attr('x', p[0]).attr('y', p[1]).attr('text-anchor', 'middle').text(l.text);
+  });
+}
+
+// ---------- סיבוב בגרירה ----------
+let spinning = !reduce, animating = false;
+svg.call(d3.drag()
+  .on('start', () => { spinning = false; })
+  .on('drag', e => {
+    if (animating || !projection.clipAngle()) return;
+    const r = projection.rotate(), k = 75 / projection.scale();
+    projection.rotate([r[0] + e.dx * k, Math.max(-80, Math.min(80, r[1] - e.dy * k)), r[2]]);
+    render();
+  }));
+d3.timer(() => {
+  if (!spinning || animating) return;
+  const r = projection.rotate();
+  projection.rotate([r[0] + 0.15, r[1], r[2]]);
+  render();
+});
+
+function flyTo(lonlat, scale, ms = 1100) {
+  animating = true; spinning = false;
+  const r0 = projection.rotate(), r1 = [-lonlat[0], -lonlat[1], 0];
+  // הדרך הקצרה סביב הכדור
+  while (r1[0] - r0[0] > 180) r1[0] -= 360;
+  while (r1[0] - r0[0] < -180) r1[0] += 360;
+  const ir = d3.interpolate(r0, r1), is = d3.interpolate(projection.scale(), scale || projection.scale());
+  return new Promise(res => {
+    if (reduce) ms = 1;
+    const t = d3.timer(el => {
+      const k = d3.easeCubicInOut(Math.min(1, el / ms));
+      projection.rotate(ir(k)).scale(is(k));
+      render();
+      if (k >= 1) { t.stop(); animating = false; res(); }
+    });
+  });
+}
+
+// =========================================================
+//  1. יבשה או מים?
+// =========================================================
+function modeToss() {
+  $('title').textContent = 'יבשה או מים?';
+  $('lead').textContent = 'זורקים את כדור הארץ 20 פעם. בכל פעם בודקים: האגודל נחת על מים או על יבשה?';
+  $('crumb').textContent = 'מדעים · מפגש 1';
+  let guess = null, water = 0, landN = 0;
+  const N = 20;
+
+  function askGuess() {
+    side.innerHTML = `<div class="card guess"><h2>🤔 קודם מנחשים</h2>
+      <div>על כדור הארץ יש יותר...</div>
+      <button class="btn alt" data-g="w">🌊 מים</button>
+      <button class="btn alt" data-g="l">⛰️ יבשה</button>
+      <button class="btn alt" data-g="s">⚖️ אותו דבר</button></div>`;
+    side.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { guess = b.dataset.g; play(); });
+  }
+  function play() {
+    side.innerHTML = `
+      <div class="msg" id="msg">לוחצים "זורקים!"</div>
+      <button class="btn" id="toss">🫳 זורקים!</button>
+      <div class="count"><div>🌊 מים<b id="cw">0</b></div><div>⛰️ יבשה<b id="cl">0</b></div></div>
+      <div class="dots" id="dots">${Array.from({ length: N }, () => '<span></span>').join('')}</div>
+      <div style="text-align:center" id="sq">${squishySVG('#2A9D8F', 80)}</div>`;
+    $('toss').onclick = toss;
+  }
+  async function toss() {
+    const b = $('toss'); b.disabled = true;
+    marker = null;
+    // נקודה אקראית על הכדור, בפיזור שווה (לא סתם קו רוחב אקראי)
+    const lon = Math.random() * 360 - 180;
+    const lat = Math.asin(2 * Math.random() - 1) * 180 / Math.PI;
+    await flyTo([lon + (Math.random() * 120 - 60), lat * 0.5], R0, 500);
+    await flyTo([lon, lat], R0, 700);
+    marker = [lon, lat]; render();
+    const isLand = d3.geoContains(land, [lon, lat]);
+    if (isLand) landN++; else water++;
+    const i = water + landN - 1;
+    const dot = $('dots').children[i];
+    dot.className = isLand ? 'l' : 'w'; dot.textContent = isLand ? '⛰️' : '🌊';
+    $('cw').textContent = water; $('cl').textContent = landN;
+    $('msg').textContent = isLand ? '⛰️ יבשה!' : '🌊 מים!';
+    bounce($('sq').firstElementChild);
+    if (water + landN >= N) return finish();
+    b.disabled = false;
+  }
+  function finish() {
+    const right = guess === 'w';
+    side.insertAdjacentHTML('beforeend', `<div class="result">
+      <h2>${right ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>
+      <p>יצא <b>${water}</b> פעמים מים ו־<b>${landN}</b> פעמים יבשה.</p>
+      <p>על כל כדור הארץ: <b>בערך 7 מכל 10 חלקים הם מים.</b> לכן מהחלל הוא נראה כחול.</p>
+      ${right ? '' : '<p>הניחוש שלך לא התאים, וזה בדיוק מה שעוזר לזכור. 💪</p>'}
+      <div class="btn-row"><button class="btn teal" id="again">🔁 עוד 20</button></div></div>`);
+    $('again').onclick = () => { water = landN = 0; marker = null; render(); play(); };
+  }
+  askGuess();
+}
+
+// =========================================================
+//  2. משטחים את הכדור
+// =========================================================
+function modeFlat() {
+  $('title').textContent = 'משטחים את הכדור';
+  $('lead').textContent = 'גלובוס הוא עגול. מפה היא שטוחה. מה קורה כשמשטחים כדור?';
+  $('crumb').textContent = 'מדעים · מפגש 2';
+  highlights = { '304': 'hl-main', '036': 'hl-teal' };
+  labels = [{ lonlat: [-41, 74], text: 'גרינלנד' }, { lonlat: [134, -25], text: 'אוסטרליה' }];
+
+  const MAXLAT = 84 * Math.PI / 180;
+  const merc = (x, y) => [x, Math.log(Math.tan(Math.PI / 4 + Math.max(-MAXLAT, Math.min(MAXLAT, y)) / 2))];
+  let rot = projection.rotate();
+  function setT(t) {
+    if (t <= 0) {
+      projection = d3.geoOrthographic().scale(R0).translate(C).clipAngle(90).rotate(rot);
+    } else {
+      projection = d3.geoProjection((x, y) => {
+        const a = d3.geoOrthographicRaw(x, y), b = merc(x, y);
+        return [a[0] * (1 - t) + b[0] * t, a[1] * (1 - t) + b[1] * t];
+      }).scale(R0 * (1 - t) + 86 * t).translate(C).rotate(rot);
+      projection.clipAngle(t < 1 ? 90 + t * 89.9 : null);
+    }
+    path = d3.geoPath(projection);
+    render();
+  }
+  side.innerHTML = `
+    <div class="card"><h2>🤔 מנחשים</h2><p>מה יותר גדול באמת?</p>
+      <div class="btn-row" style="margin:8px 0 0"><button class="btn alt" data-g="g">🟠 גרינלנד</button><button class="btn alt" data-g="a">🟢 אוסטרליה</button></div></div>
+    <div id="rest" hidden>
+      <div class="hint">אפשר לסובב את הגלובוס עם האצבע ולמצוא את שתיהן.</div>
+      <div class="btn-row"><button class="btn" id="go">🍊 משטחים!</button></div>
+      <label>או מזיזים לאט: <input type="range" id="t" min="0" max="100" value="0"></label>
+      <div class="result" id="res" hidden></div>
+    </div>`;
+  side.querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
+    side.querySelectorAll('[data-g]').forEach(x => x.disabled = x !== b);
+    $('rest').hidden = false;
+    side.dataset.g = b.dataset.g;
+  });
+  let flat = false;
+  async function animateTo(target) {
+    spinning = false;
+    if (target === 1) { await flyTo([0, 0], R0, 700); rot = projection.rotate(); }
+    animating = true;
+    const from = +$('t').value / 100, ms = reduce ? 1 : 2200;
+    await new Promise(res => {
+      const tm = d3.timer(el => {
+        const k = d3.easeCubicInOut(Math.min(1, el / ms)), t = from + (target - from) * k;
+        setT(t); $('t').value = Math.round(t * 100);
+        if (k >= 1) { tm.stop(); res(); }
+      });
+    });
+    animating = false;
+    flat = target === 1;
+    $('go').textContent = flat ? '🌍 חזרה לכדור' : '🍊 משטחים!';
+    if (flat) showResult();
+  }
+  function showResult() {
+    const r = $('res'); r.hidden = false;
+    r.innerHTML = `<h2>${side.dataset.g === 'a' ? '🎯 צדקת!' : '😮 הפתעה!'}</h2>
+      <p>במפה <b>גרינלנד</b> נראית ענקית, גדולה יותר מאוסטרליה.</p>
+      <p>אבל באמת <b>אוסטרליה גדולה פי 3</b>. כדי לשטח כדור, המפה מותחת את מה שרחוק מהאמצע, כמו קליפת התפוז.</p>`;
+  }
+  $('go').onclick = () => animateTo(flat ? 0 : 1);
+  $('t').oninput = e => { spinning = false; if (+e.target.value === 0) rot = projection.rotate(); setT(+e.target.value / 100); };
+}
+
+// =========================================================
+//  3. הכתובת שלי
+// =========================================================
+const ASIA = ['004','051','031','048','050','064','096','116','156','196','268','356','360','364','368','376','392','400','398','414','417','418','422','458','496','104','524','408','512','586','275','608','634','682','410','144','760','158','762','764','626','792','795','784','860','704','887'];
+function modeAddress() {
+  $('title').textContent = 'הכתובת שלי';
+  $('lead').textContent = 'יוצאים מהבית, צעד אחרי צעד, עד שרואים את כל כדור הארץ.';
+  $('crumb').textContent = 'מדעים · מפגש 3';
+  const STEPS = [
+    { name: 'הבית שלי', ring: 'בית', show: () => overlay('🏠', 'הבית שלי', 'כאן אני גרה.') },
+    { name: 'העיר שלי', ring: 'עיר', show: () => overlay('🏘️', 'העיר שלי', 'הבית שלי נמצא בתוך עיר.<br>בעיר יש הרבה בתים.') },
+    { name: 'ישראל', ring: 'ישראל', show: async () => { overlay(null); highlights = { '376': 'hl-main' }; labels = [{ lonlat: [35, 31.4], text: 'ישראל' }]; extraDraw = null; await flyTo([35, 31.5], 2600); } },
+    { name: 'אסיה', ring: 'אסיה', show: async () => {
+        overlay(null);
+        highlights = Object.fromEntries(ASIA.map(id => [id, 'hl-asia'])); highlights['376'] = 'hl-main';
+        labels = [{ lonlat: [88, 42], text: 'אסיה' }];
+        extraDraw = asiaRussia;
+        await flyTo([85, 35], 330); } },
+    { name: 'כדור הארץ', ring: 'כדור הארץ', show: async () => { overlay(null); labels = [{ lonlat: [35, 31.5], text: 'ישראל' }]; await flyTo([30, 15], R0); spinning = !reduce; } }
+  ];
+  const ringR = [26, 55, 82, 109, 136];
+  side.innerHTML = `
+    <svg class="rings" viewBox="0 0 300 300" aria-hidden="true">
+      ${ringR.map((r, i) => `<circle r="${r}" cx="150" cy="150" class="off" id="r${i}"/>
+        <text x="150" y="${i === 0 ? 155 : 150 - r + 18}" class="off" id="t${i}">${STEPS[i].ring}</text>`).join('')}
+    </svg>
+    <div class="btn-row"><button class="btn alt" id="prev">→ פנימה</button><button class="btn" id="next">עוד צעד החוצה ←</button></div>
+    <div class="msg" id="msg"></div>`;
+  let step = -1;
+  async function go(n) {
+    step = Math.max(0, Math.min(STEPS.length - 1, n));
+    ringR.forEach((_, i) => { $('r' + i).classList.toggle('off', i > step); $('t' + i).classList.toggle('off', i > step); });
+    $('msg').textContent = STEPS.slice(0, step + 1).map(s => s.name).join(' ← ');
+    $('next').disabled = step === STEPS.length - 1; $('prev').disabled = step === 0;
+    await STEPS[step].show();
+    if (step === STEPS.length - 1) $('msg').innerHTML += '<br><b>זו הכתובת שלי ביקום!</b>';
+  }
+  $('next').onclick = () => go(step + 1);
+  $('prev').onclick = () => go(step - 1);
+  spinning = false;
+  projection.rotate([-35, -31.5]).scale(2600);
+  highlights = { '376': 'hl-main' };
+  go(0);
+}
+function overlay(icon, title, text) {
+  const o = $('overlay');
+  if (!icon) { o.hidden = true; return; }
+  o.hidden = false;
+  o.innerHTML = `<div><div class="big">${icon}</div><h2 style="margin:10px 0 4px">${title}</h2><p>${text}</p></div>`;
+}
+// החלק האסייתי של רוסיה: מזרחית להרי אורל (בערך קו אורך 60)
+function asiaRussia() {
+  const ru = byId['643']; if (!ru) return;
+  const ring = [];
+  for (let x = 60; x <= 180; x += 5) ring.push([x, 82]);
+  for (let x = 180; x >= 60; x -= 5) ring.push([x, 42]);
+  ring.push([60, 82]);
+  const clip = { type: 'Polygon', coordinates: [ring.slice().reverse()] };
+  // אם הכיוון הפוך, d3 מצייר את כל העולם חוץ מהמלבן. בודקים לפי השטח.
+  const area = d3.geoArea(clip);
+  if (area > 2 * Math.PI) clip.coordinates = [ring];
+  gExtra.append('clipPath').attr('id', 'ru-asia').append('path').attr('d', path(clip));
+  gExtra.append('path').attr('class', 'country hl-asia').attr('clip-path', 'url(#ru-asia)').attr('d', path(ru));
+}
+
+// =========================================================
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(r => r.json()).then(world => {
+  countries = topojson.feature(world, world.objects.countries).features;
+  land = topojson.feature(world, world.objects.land);
+  countries.forEach(c => byId[c.id] = c);
+  ({ toss: modeToss, flat: modeFlat, address: modeAddress }[mode] || modeToss)();
+  render();
+}).catch(() => { $('lead').textContent = 'לא הצלחנו לטעון את המפה. בודקים שיש אינטרנט ומרעננים.'; });
+</script>
+</body>
+</html>
